@@ -5,7 +5,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
-// GET: Fetch all teams for the logged-in user with their tasks
 export async function GET(request) {
     try {
         const session = await getServerSession(authOptions);
@@ -35,7 +34,6 @@ export async function GET(request) {
     }
 }
 
-// POST: Create a new team for the logged-in user (and optionally, its tasks)
 export async function POST(request) {
     try {
         const session = await getServerSession(authOptions);

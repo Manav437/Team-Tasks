@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from 'next/image'
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -19,7 +20,6 @@ export default function TeamsPage() {
 
     const router = useRouter();
 
-
     function getStatusClasses(stage) {
         if (stage === "Not Started") return "text-gray-700 bg-gray-100";
         if (stage === "In Progress") return "text-yellow-800 bg-yellow-100";
@@ -36,17 +36,18 @@ export default function TeamsPage() {
     useEffect(() => {
         async function fetchTeams() {
             try {
-                const res = await fetch("/api/teams");
+                const res = await fetch("/api/teams");      //by default GET req
                 if (!res.ok) {
                     // If unauthorized, redirect to login
-                    if (res.status === 401) {
-                        router.push("/auth/login");
-                        return;
-                    }
+                    // if (res.status === 401) {
+                    //     router.push("/auth/login");
+                    //     return;
+                    // }
                     throw new Error("Failed to fetch teams");
                 }
                 const data = await res.json();
                 setTeams(Array.isArray(data) ? data : []);
+                // console.log(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -86,7 +87,6 @@ export default function TeamsPage() {
         }
     }
 
-    // Sidebar content (responsive)
     function Sidebar() {
         return (
             <>
@@ -95,36 +95,41 @@ export default function TeamsPage() {
                     className={`hidden md:flex h-screen fixed top-0 left-0 z-40 bg-white border-r border-gray-200 shadow transition-all duration-300
                     w-54 flex-col`}
                 >
-                    <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
-                        <span className="font-bold text-lg text-indigo-700">Admin Panel</span>
+                    <div className="flex items-center gap-2 justify-start h-16 px-4 border-b border-gray-200">
+                        <Image alt="task-teams-logo" height={30} width={30} src="/tasks-teams.png" />
+                        <span className="font-bold text-lg text-[#2a4d7d]">Admin Panel</span>
                     </div>
-                    <nav className="flex-1 flex flex-col gap-2 mt-4">
+                    <nav className="flex-1 flex flex-col gap-2 mt-4 border-b-1 border-gray-200">
                         <Link
                             href="/teams"
-                            className="flex items-center px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-indigo-700 font-semibold"
+                            className="flex items-center gap-2 px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700 font-semibold"
                         >
-                            <span className="material-icons mr-2">Groups</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M1 17.577v-.863q0-.922.985-1.53q.984-.607 2.534-.607q.229 0 .49.022q.262.022.556.072q-.234.41-.342.84q-.107.431-.107.864v1.202zm6 0v-1.125q0-.604.351-1.105q.351-.5 1.036-.866q.684-.365 1.595-.548t2.01-.183q1.121 0 2.032.183t1.595.548t1.033.866t.348 1.105v1.125zm11.885 0v-1.196q0-.479-.105-.902t-.314-.808q.313-.05.562-.072t.472-.022q1.55 0 2.525.605T23 16.714v.863zM4.514 13.635q-.589 0-1.003-.418q-.415-.418-.415-1.005q0-.581.418-.993t1.005-.411q.581 0 1.002.411q.421.412.421.998q0 .57-.41.994q-.411.424-1.018.424m14.986 0q-.575 0-.999-.424t-.424-.994q0-.586.424-.998t1.003-.411q.596 0 1.008.411t.411.993q0 .587-.409 1.005q-.41.418-1.014.418M12.007 13q-.91 0-1.555-.64q-.644-.639-.644-1.552q0-.932.639-1.562q.64-.63 1.553-.63q.932 0 1.562.628t.63 1.557q0 .91-.628 1.555T12.007 13" /></svg>
+                            Groups
                         </Link>
                         <Link
                             href="/projects"
-                            className="flex items-center px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700"
+                            className="flex items-center gap-2 px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700 font-semibold"
                         >
-                            <span className="material-icons mr-2">Work</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4.616 20q-.691 0-1.153-.462T3 18.384V8.616q0-.691.463-1.153T4.615 7H9V5.615q0-.69.463-1.153T10.616 4h2.769q.69 0 1.153.462T15 5.615V7h4.385q.69 0 1.152.463T21 8.616v9.769q0 .69-.463 1.153T19.385 20zM10 7h4V5.615q0-.23-.192-.423T13.385 5h-2.77q-.23 0-.423.192T10 5.615z" /></svg>
+                            Work
                         </Link>
                         <Link
                             href="/settings"
-                            className="flex items-center px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700"
+                            className="flex items-center gap-2 px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700 font-semibold"
                         >
-                            <span className="material-icons mr-2">Settings</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M10.96 21q-.349 0-.605-.229q-.257-.229-.319-.571l-.263-2.092q-.479-.145-1.036-.454q-.556-.31-.947-.664l-1.915.824q-.317.14-.644.03t-.504-.415L3.648 15.57q-.177-.305-.104-.638t.348-.546l1.672-1.25q-.045-.272-.073-.559q-.03-.288-.03-.559q0-.252.03-.53q.028-.278.073-.626l-1.672-1.25q-.275-.213-.338-.555t.113-.648l1.06-1.8q.177-.287.504-.406t.644.021l1.896.804q.448-.373.97-.673q.52-.3 1.013-.464l.283-2.092q.061-.342.318-.571T10.96 3h2.08q.349 0 .605.229q.257.229.319.571l.263 2.112q.575.202 1.016.463t.909.654l1.992-.804q.318-.14.645-.021t.503.406l1.06 1.819q.177.306.104.638t-.348.547L18.36 10.92q.082.31.092.569t.01.51q0 .233-.02.491q-.019.259-.088.626l1.69 1.27q.275.213.358.546t-.094.638l-1.066 1.839q-.176.306-.513.415q-.337.11-.654-.03l-1.923-.824q-.467.393-.94.673t-.985.445l-.264 2.111q-.061.342-.318.571t-.605.23zm1.013-6.5q1.046 0 1.773-.727T14.473 12t-.727-1.773t-1.773-.727q-1.052 0-1.776.727T9.473 12t.724 1.773t1.776.727" /></svg>
+                            Settings
                         </Link>
                     </nav>
-                    <div className="flex flex-row items-center justify-between mb-10 w-full gap-2">
-                        <div className="flex gap-2 items-center pl-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5.85 17.1q1.275-.975 2.85-1.537T12 15t3.3.563t2.85 1.537q.875-1.025 1.363-2.325T20 12q0-3.325-2.337-5.663T12 4T6.337 6.338T4 12q0 1.475.488 2.775T5.85 17.1M12 13q-1.475 0-2.488-1.012T8.5 9.5t1.013-2.488T12 6t2.488 1.013T15.5 9.5t-1.012 2.488T12 13m0 9q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22" /></svg>
-                            <span>Mr. manav</span>
+                    <div className="flex flex-row items-center justify-between mt-4 mb-4 min-w-11/12 mx-2 gap-2 bg-slate-200 rounded-lg">
+                        <div className="flex gap-1 items-center pl-2">
+                            {/* <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5.85 17.1q1.275-.975 2.85-1.537T12 15t3.3.563t2.85 1.537q.875-1.025 1.363-2.325T20 12q0-3.325-2.337-5.663T12 4T6.337 6.338T4 12q0 1.475.488 2.775T5.85 17.1M12 13q-1.475 0-2.488-1.012T8.5 9.5t1.013-2.488T12 6t2.488 1.013T15.5 9.5t-1.012 2.488T12 13m0 9q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22" /></svg> */}
+                            <img className='bg-white p-0.5 size-8 rounded-2xl border-1 border-gray-600' src="https://img.icons8.com/?size=100&id=81139&format=png&color=000000" alt="" />
+                            <span className="font-semibold">Admin - ABC</span>
                         </div>
                         <button
-                            className="cursor-pointer flex items-center px-4 py-2 rounded transition-colors hover:bg-red-50 text-red-600 font-semibold"
+                            className="cursor-pointer flex items-center px-2 py-2 rounded transition-colors border-1 border-transparent hover:border-1 hover:border-red-600 hover:bg-red-200 text-red-600 font-semibold"
                             onClick={() => signOut({ callbackUrl: "/auth/login" })}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -138,13 +143,13 @@ export default function TeamsPage() {
                     <div className="fixed inset-0 z-50 flex md:hidden">
                         {/* Overlay background */}
                         <div
-                            className="fixed inset-0 bg-black bg-opacity-30"
+                            className="fixed inset-0 bg-slate-200/60"
                             onClick={() => setSidebarOpen(false)}
                         />
                         {/* Sidebar panel */}
                         <aside className="relative w-64 bg-white h-full shadow-lg flex flex-col z-50">
                             <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
-                                <span className="font-bold text-lg text-indigo-700">Admin Panel</span>
+                                <span className="font-bold text-lg text-[#2a4d7d]">Admin Panel</span>
                                 <button
                                     className="ml-auto text-gray-500 hover:text-indigo-700 focus:outline-none"
                                     onClick={() => setSidebarOpen(false)}
@@ -156,24 +161,27 @@ export default function TeamsPage() {
                             <nav className="flex-1 flex flex-col gap-2 mt-4">
                                 <Link
                                     href="/teams"
-                                    className="flex items-center px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-indigo-700 font-semibold"
+                                    className="flex items-center gap-2 px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700 font-semibold"
                                     onClick={() => setSidebarOpen(false)}
                                 >
-                                    <span className="material-icons mr-2">groups</span>
-                                </Link>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M1 17.577v-.863q0-.922.985-1.53q.984-.607 2.534-.607q.229 0 .49.022q.262.022.556.072q-.234.41-.342.84q-.107.431-.107.864v1.202zm6 0v-1.125q0-.604.351-1.105q.351-.5 1.036-.866q.684-.365 1.595-.548t2.01-.183q1.121 0 2.032.183t1.595.548t1.033.866t.348 1.105v1.125zm11.885 0v-1.196q0-.479-.105-.902t-.314-.808q.313-.05.562-.072t.472-.022q1.55 0 2.525.605T23 16.714v.863zM4.514 13.635q-.589 0-1.003-.418q-.415-.418-.415-1.005q0-.581.418-.993t1.005-.411q.581 0 1.002.411q.421.412.421.998q0 .57-.41.994q-.411.424-1.018.424m14.986 0q-.575 0-.999-.424t-.424-.994q0-.586.424-.998t1.003-.411q.596 0 1.008.411t.411.993q0 .587-.409 1.005q-.41.418-1.014.418M12.007 13q-.91 0-1.555-.64q-.644-.639-.644-1.552q0-.932.639-1.562q.64-.63 1.553-.63q.932 0 1.562.628t.63 1.557q0 .91-.628 1.555T12.007 13" /></svg>
+                                    Groups                                </Link>
                                 <Link
                                     href="/projects"
-                                    className="flex items-center px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700"
+                                    className="flex items-center gap-2 px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700"
                                     onClick={() => setSidebarOpen(false)}
                                 >
-                                    <span className="material-icons mr-2">work</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4.616 20q-.691 0-1.153-.462T3 18.384V8.616q0-.691.463-1.153T4.615 7H9V5.615q0-.69.463-1.153T10.616 4h2.769q.69 0 1.153.462T15 5.615V7h4.385q.69 0 1.152.463T21 8.616v9.769q0 .69-.463 1.153T19.385 20zM10 7h4V5.615q0-.23-.192-.423T13.385 5h-2.77q-.23 0-.423.192T10 5.615z" /></svg>
+                                    Work
                                 </Link>
                                 <Link
                                     href="/settings"
-                                    className="flex items-center px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700"
+                                    className="flex items-center gap-2 px-4 py-2 rounded transition-colors hover:bg-indigo-50 text-gray-700"
                                     onClick={() => setSidebarOpen(false)}
                                 >
-                                    <span className="material-icons mr-2">settings</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M10.96 21q-.349 0-.605-.229q-.257-.229-.319-.571l-.263-2.092q-.479-.145-1.036-.454q-.556-.31-.947-.664l-1.915.824q-.317.14-.644.03t-.504-.415L3.648 15.57q-.177-.305-.104-.638t.348-.546l1.672-1.25q-.045-.272-.073-.559q-.03-.288-.03-.559q0-.252.03-.53q.028-.278.073-.626l-1.672-1.25q-.275-.213-.338-.555t.113-.648l1.06-1.8q.177-.287.504-.406t.644.021l1.896.804q.448-.373.97-.673q.52-.3 1.013-.464l.283-2.092q.061-.342.318-.571T10.96 3h2.08q.349 0 .605.229q.257.229.319.571l.263 2.112q.575.202 1.016.463t.909.654l1.992-.804q.318-.14.645-.021t.503.406l1.06 1.819q.177.306.104.638t-.348.547L18.36 10.92q.082.31.092.569t.01.51q0 .233-.02.491q-.019.259-.088.626l1.69 1.27q.275.213.358.546t-.094.638l-1.066 1.839q-.176.306-.513.415q-.337.11-.654-.03l-1.923-.824q-.467.393-.94.673t-.985.445l-.264 2.111q-.061.342-.318.571t-.605.23zm1.013-6.5q1.046 0 1.773-.727T14.473 12t-.727-1.773t-1.773-.727q-1.052 0-1.776.727T9.473 12t.724 1.773t1.776.727" />
+                                    </svg>
+                                    Settings
                                 </Link>
                             </nav>
                             <button
@@ -201,9 +209,9 @@ export default function TeamsPage() {
                             <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor" />
                         </svg>
                     </button>
-                    <span className="font-bold text-lg text-indigo-700">Admin Panel</span>
+                    <span className="font-bold text-lg text-[#2a4d7d]">Admin Panel</span>
                     <button
-                        className="ml-2 text-red-600 hover:text-red-800"
+                        className=" p-1 ml-2 text-red-600 hover:text-red-800 hover:bg-red-200 rounded-lg"
                         onClick={() => signOut({ callbackUrl: "/auth/login" })}
                         aria-label="Logout"
                     >
@@ -219,22 +227,52 @@ export default function TeamsPage() {
     // Loading state
     if (loading) {
         return (
-            <div className="flex flex-col items-center min-h-screen bg-gray-50">
-                <div className="flex flex-col items-center justify-center text-lg min-h-screen text-gray-600">Loading teams...</div>
+            <div className="flex flex-col items-center min-h-screen bg-gray-50 justify-center">
+                <div className="loader1 mb-4"></div>
+                <div className="text-lg text-gray-600">Loading teams...</div>
             </div>
         );
     }
+
 
     // Error state
     if (error) {
         return (
-            <div className="flex flex-col items-center min-h-screen bg-gray-50 py-8">
-                <div className="text-lg text-red-600">Error: {error}</div>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-8">
+                <div className="flex flex-col items-center bg-white shadow-md rounded-lg p-8">
+                    <svg
+                        className="w-12 h-12 text-red-500 mb-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+                    </svg>
+                    <div className="text-xl font-semibold text-red-600 mb-2" role="alert">
+                        Error: {error}
+                    </div>
+                    <div className="mb-4 text-gray-700">
+                        Please{" "}
+                        <Link
+                            className="underline underline-offset-2 hover:text-green-600 transition-colors"
+                            href="/auth/login"
+                        >
+                            Log in
+                        </Link>{" "}
+                        first.
+                    </div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
             </div>
         );
     }
 
-    // Main UI
     return (
         <div className="flex min-h-screen min-w-screen bg-gradient-to-br from-slate-100 via-gray-50 to-white">
             <Sidebar />
@@ -245,14 +283,14 @@ export default function TeamsPage() {
                 `}
             >
                 <div className="w-full flex flex-row justify-between items-center mb-6 mt-4">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Teams & Work Status</h1>
+                    <h1 className="text-2xl underline underline-offset-2 sm:text-3xl font-extrabold text-slate-800 tracking-tight">Teams & Work Status</h1>
 
                     {teams.length > 0 && (
                         <button
                             className="cursor-pointer px-4 py-2 rounded-lg font-semibold transition-colors shadow bg-green-600 text-white hover:bg-green-700 text-sm sm:text-base"
                             onClick={() => setShowForm(true)}
                         >
-                            Add New Team
+                            + Add New Team
                         </button>
                     )}
                 </div>
@@ -262,14 +300,14 @@ export default function TeamsPage() {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70">
                         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-lg border border-gray-200 relative">
                             <button
-                                className="cursor-pointer absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+                                className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
                                 onClick={() => setShowForm(false)}
                                 aria-label="Close"
                                 type="button"
                             >
                                 &times;
                             </button>
-                            <h2 className="text-xl font-bold mb-4 text-slate-800">Add New Team</h2>
+                            <h2 className="underline underline-offset-2 text-xl font-bold mb-4 text-slate-800">Add New Team</h2>
                             <form onSubmit={handleAddTeam} className="flex flex-col gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Team Name</label>
@@ -305,7 +343,7 @@ export default function TeamsPage() {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="mt-2 px-4 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
+                                    className="cursor-pointer mt-2 px-4 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
                                 >
                                     Add Team
                                 </button>
@@ -317,15 +355,19 @@ export default function TeamsPage() {
                 {/* No teams state */}
                 {teams.length === 0 && (
                     <div className="flex flex-col items-center w-full py-16">
-                        <div className="text-lg text-gray-600 mb-4">No teams found yet.</div>
+                        <div className="text-lg text-gray-600 mb-2">No teams found yet.</div>
+                        <div className="text-sm text-gray-400 mb-4 italic">
+                            It's quieter than a library in here... Time to start your first team!
+                        </div>
                         <button
                             className="cursor-pointer px-5 py-2 rounded-lg font-semibold transition-colors shadow bg-green-600 text-white hover:bg-green-700"
                             onClick={() => setShowForm(true)}
                         >
-                            Add Your First Team
+                            + Add Your First Team
                         </button>
                     </div>
                 )}
+
 
                 {/* Teams Table (desktop) or Card List (mobile) */}
                 {teams.length > 0 && (
@@ -335,7 +377,7 @@ export default function TeamsPage() {
                             <table className="min-w-full text-sm border-collapse">
                                 <thead className="bg-slate-100">
                                     <tr>
-                                        <th className="p-4 border-b border-gray-200 border-r text-left">S.No.</th>
+                                        <th className="p-4 border-b border-gray-200 border-r text-center">S.No.</th>
                                         <th className="p-4 border-b border-gray-200 border-r text-left">Team Name</th>
                                         <th className="p-4 border-b border-gray-200 border-r text-left">Task Title</th>
                                         <th className="p-4 border-b border-gray-200 text-left">Stage</th>
@@ -424,7 +466,7 @@ export default function TeamsPage() {
                                         team.tasks.map((task, idx) => (
                                             <div key={task.id || task._id} className="flex items-center justify-between mt-2">
                                                 <div className="font-medium text-slate-700">{task.title}</div>
-                                                <span className={`ml-2 px-2 py-1 rounded text-xs ${getStatusClasses(task.status)}`}>
+                                                <span className={`flex items-center ml-2 px-2 py-1 rounded text-xs ${getStatusClasses(task.status)}`}>
                                                     <span className={`inline-block w-2 h-2 rounded-full mr-1 align-middle ${getDotColor(task.status)}`} />
                                                     {task.status}
                                                 </span>

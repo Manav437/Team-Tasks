@@ -19,6 +19,7 @@ body {
 }
 .loader:before {
   content:"Loading...";
+  /* background: #2c2c2cdb; */
 }
 
 @keyframes l33{
@@ -82,4 +83,16 @@ body {
         calc( 0*var(--w)) 0 #fff,calc(-1*var(--w)) 0 #fff,calc(-2*var(--w)) 0 9px #fff,calc(-3*var(--w)) 0 #fff,calc(-4*var(--w)) 0 #fff, 
         calc(-5*var(--w)) 0 #fff,calc(-6*var(--w)) 0 #fff,calc(-7*var(--w)) 0 #fff,calc(-8*var(--w)) 0 #fff,calc(-9*var(--w)) 0 #fff;
   }
+}
+
+
+/* HTML: <div class="loader"></div> */
+.loader1 {
+  height: 15px;
+  aspect-ratio: 5;
+  background: radial-gradient(closest-side at 37.5% 50%,#000 94%,#0000) 0/calc(80%/3) 100%;
+  animation: l47 .75s infinite;
+}
+@keyframes l47 {
+  100% {background-position: 36.36%}
 }

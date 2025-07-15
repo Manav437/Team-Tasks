@@ -1,4 +1,6 @@
+// Home.jsx
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,267 +8,236 @@ import "./globals.css";
 
 export default function Home() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const router = useRouter();
 
     return (
-        <main className="flex flex-col min-h-screen bg-white">
-            {/* Navbar */}
-            <header className="w-full flex flex-col md:flex-row justify-between items-center px-4 md:px-8 py-4 md:py-6 shadow-sm bg-white relative z-50">
-                <div className="flex items-center justify-between w-full md:w-auto">
-                    <div className="flex items-center gap-3">
-                        <Image
-                            src="/tasks-teams.png"
-                            alt="TaskTeams Logo"
-                            width={40}
-                            height={40}
-                        />
-                        <span className="text-2xl font-bold text-[#5d85bd] tracking-wide">
-                            TaskTeams
-                        </span>
-                    </div>
-                    {/* Hamburger for mobile */}
-                    <button
-                        className="md:hidden p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onClick={() => setMenuOpen(true)}
-                        aria-label="Open navigation"
-                    >
-                        {/* 3-stripe hamburger icon */}
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                            <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor" />
-                            <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
-                            <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor" />
-                        </svg>
-                    </button>
+        <main className="flex flex-col min-h-screen bg-[url('/landing-page-bg.png')]">
+            {/* Header */}
+            <header
+                className="w-full px-4 py-4 flex items-center justify-between max-w-6xl mx-auto"
+                style={{ fontFamily: "Fragment Mono" }}
+            >
+                {/* Logo always on the left */}
+                <div className="flex items-center">
+                    <Image
+                        height={45}
+                        width={45}
+                        alt="TaskTeams logo"
+                        src="/tasks-teams.png"
+                        className="mx-auto"
+                        priority
+                    />
                 </div>
-                {/* Desktop Nav links */}
-                <nav
-                    className={`
-                        hidden md:flex flex-row
-                        md:items-center md:gap-0 gap-2
-                        w-full md:w-auto mt-4 md:mt-0
-                    `}
-                >
+
+                {/* Desktop nav links */}
+                <div className="hidden sm:flex items-center gap-4">
                     <Link
-                        href="#"
-                        className="text-slate-700 font-medium px-4 py-2 rounded hover:bg-slate-100 transition"
+                        className="hover:bg-blue-200 rounded-lg px-2 py-1 transition-all duration-300"
+                        href="/"
                     >
-                        Features
+                        Pricing
                     </Link>
                     <Link
-                        href="#"
-                        className="md:ml-2 text-slate-700 font-medium px-4 py-2 rounded hover:bg-slate-100 transition"
+                        className="hover:bg-blue-200 rounded-lg px-2 py-1 transition-all duration-300"
+                        href="/"
                     >
-                        Teams
+                        Blogs
                     </Link>
                     <Link
+                        className="hover:bg-green-200 rounded-lg px-2 py-1 transition-all duration-300"
                         href="/auth/login"
-                        className="md:ml-2 text-slate-700 font-medium px-4 py-2 rounded hover:bg-slate-100 transition"
                     >
                         Log In
                     </Link>
                     <Link
+                        className="hover:bg-green-200 rounded-lg px-2 py-1 transition-all duration-300"
                         href="/auth/signup"
-                        className="md:ml-2 text-slate-700 font-medium px-4 py-2 rounded hover:bg-slate-100 transition"
                     >
                         Sign Up
                     </Link>
-                </nav>
+                </div>
+
+                {/* Hamburger for mobile */}
+                <button
+                    className="z-1000 sm:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-gray-200 transition"
+                    aria-label={menuOpen ? "Close menu" : "Open menu"}
+                    onClick={() => setMenuOpen((open) => !open)}
+                >
+                    <span
+                        className={`block h-0.5 w-6 bg-black transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-1.5" : ""
+                            }`}
+                    />
+                    <span
+                        className={`block h-0.5 w-6 bg-black my-1 transition-all duration-300 ${menuOpen ? "opacity-0" : ""
+                            }`}
+                    />
+                    <span
+                        className={`block h-0.5 w-6 bg-black transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                            }`}
+                    />
+                </button>
+
+                {/* Mobile menu */}
+                {menuOpen && (
+                    <nav className="absolute top-0 left-0 rounded-b-4xl w-full bg-white shadow-lg z-50 sm:hidden animate-fade-in">
+                        <ul className="flex flex-col items-center gap-4 py-8">
+                            <li>
+                                <Link
+                                    href="/"
+                                    className="block px-4 py-2 text-lg hover:bg-blue-100 rounded"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    Pricing
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/"
+                                    className="block px-4 py-2 text-lg hover:bg-blue-100 rounded"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    Blogs
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/auth/login"
+                                    className="block px-4 py-2 text-lg hover:bg-green-100 rounded"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    Log In
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/auth/signup"
+                                    className="block px-4 py-2 text-lg hover:bg-green-100 rounded"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    Sign Up
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
+                )}
             </header>
 
-            {/* Mobile Menu Overlay */}
-            {menuOpen && (
-                <div className={`fixed inset-0 z-50 md:hidden pointer-events-none`}>
-                    {/* Overlay background */}
-                    <div
-                        className={`fixed inset-0 bg-black bg-opacity-30 transition-opacity duration-300 ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0"}`}
-                        onClick={() => setMenuOpen(false)}
-                    />
-                    {/* Top slide-in menu */}
-                    <nav
-                        className={`
-                        fixed top-0 left-0 w-full bg-white shadow-lg flex flex-col z-50
-                        transition-transform duration-300
-                        ${menuOpen ? "translate-y-0 pointer-events-auto" : "-translate-y-full pointer-events-none"}
-                    `}
-                        style={{ minHeight: "260px" }}
-                    >
-                        <button
-                            className="ml-auto m-4 text-gray-500 hover:text-indigo-700 focus:outline-none"
-                            onClick={() => setMenuOpen(false)}
-                            aria-label="Close menu"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                        <Link
-                            href="#"
-                            className="px-6 py-3 text-indigo-700 font-semibold hover:bg-indigo-50"
-                            onClick={() => setMenuOpen(false)}
-                        >
-                            Features
-                        </Link>
-                        <Link
-                            href="#"
-                            className="px-6 py-3 text-slate-700 font-medium hover:bg-slate-100"
-                            onClick={() => setMenuOpen(false)}
-                        >
-                            Teams
-                        </Link>
-                        <Link
-                            href="/auth/login"
-                            className="px-6 py-3 text-slate-700 font-medium hover:bg-slate-100"
-                            onClick={() => setMenuOpen(false)}
-                        >
-                            Log In
-                        </Link>
-                        <Link
-                            href="/auth/signup"
-                            className="px-6 py-3 text-slate-700 font-medium hover:bg-slate-100"
-                            onClick={() => setMenuOpen(false)}
-                        >
-                            Sign Up
-                        </Link>
-                    </nav>
-                </div>
-            )}
+            {/* Beta Banner */}
+            <section className="w-full flex justify-center mt-2">
+                <span className="cursor-pointer text-sm flex items-center gap-2 w-fit bg-white rounded-md px-3 py-1 shadow transition-all duration-300 hover:gap-4">
+                    <svg className="size-5" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><path fill="#ca2c31" d="m3.77 71.73l16.34-16.1l27.82-4.93l-2.75 14.56L7.57 76.82l-2.43-1.05z" /><path fill="#a02422" d="M22.94 59.76L5.2 75.88l13.05 6.36l19.81-10.11v-4.77l4.05-10.92zm41.98 28.39l-8.57 3.72l-8.09 17.15s7.12 15.77 7.44 15.77s4.37.32 4.37.32l14.4-16.1l3.64-27.5z" /><path fill="#ca2c31" d="M56.5 100.84s4.77-.97 8.17-2.59s7.6-4.04 7.6-4.04l-1.54 13.43l-15.05 17.13s-.59-.73-3.09-6.17c-1.99-4.34-2.68-5.89-2.68-5.89z" /><path fill="#f7d74d" d="M31.58 80.66s-5.74-.48-12.03 7.47c-5.74 7.26-8.43 19.08-9.47 22.12s-3.53 3.66-2.7 5.05s4.42 1.31 8.85.76s8.23-1.94 8.23-1.94s-.19.48-.83 1.52c-.23.37-1.03.9-.97 1.45c.14 1.31 11.36 1.34 20.32-7.88c9.68-9.95 4.98-18.11 4.98-18.11z" /><path fill="#fbf0b4" d="M33.31 85.29s-6.19.33-11.31 8.28s-7.5 17.16-7.01 17.78c.48.62 10.02-2.83 12.31-2.14c1.57.48.76 2.07 1.18 2.49c.35.35 4.49.94 11.19-6.32c6.71-7.26 5.12-17.46 5.12-17.46z" /><path fill="#858585" d="M36.35 74.44s-3.11 2.77-4.22 4.36s-1.11 1.73-1.04 2.21s1.22 5.75 6.01 10.37c5.88 5.67 11.13 6.43 11.89 6.43s5.81-5.67 5.81-5.67z" /><path fill="#437687" d="M50.1 91.24s5.04 3.31 13.49.47c11.55-3.88 20.02-12.56 30.51-23.52c10.12-10.58 18.61-23.71 18.61-23.71l-5.95-19.93z" /><path fill="#3f545f" d="m67.99 80.33l1.39-4.32l3.48.49s2.65 1.25 4.6 2.16s4.46 1.6 4.46 1.6l-4.95 4.18s-2.7-1.02-4.67-1.88c-2.22-.97-4.31-2.23-4.31-2.23" /><path fill="#8dafbf" d="M84.32 16.14s-9.62 5.58-23.41 18.63c-12.43 11.76-21.64 22.4-23.87 31.45c-1.86 7.58-.87 12.18 3.36 17.15c4.47 5.26 9.71 7.87 9.71 7.87s3.94.06 20.38-12.59C91 62.86 107.43 36.42 107.43 36.42z" /><path fill="#d83f22" d="M104.18 41.84s-8.37-3.57-14.34-11.9c-5.93-8.27-5.46-13.86-5.46-13.86s4.96-3.89 16.11-8.34c7.5-2.99 17.71-4.52 21.07-2.03s-2.3 14.98-2.3 14.98l-10.31 19.96z" /><path fill="#6896a5" d="M68.17 80.4s-7.23-3.69-11.83-8.94c-8.7-9.91-10.5-20.79-10.5-20.79l4.37-5.13S51.3 57.1 60.63 67.09c6.08 6.51 12.43 9.49 12.43 9.49s-1.27 1.07-2.63 2.11c-.87.67-2.26 1.71-2.26 1.71" /><path fill="#a02422" d="M112.71 44.48s4.34-5.23 8.45-17.02c5.74-16.44.74-21.42.74-21.42s-1.69 7.82-7.56 18.69c-4.71 8.71-10.41 17-10.41 17s3.14 1.41 4.84 1.9c2.14.62 3.94.85 3.94.85" /><path fill="#b3e1ee" d="M39.81 69.66c1.3 1.24 3.27-.06 4.56-3.1c1.3-3.04 1.28-4.74.28-5.46c-1.24-.9-3.32 1.07-4.23 2.82c-1 1.94-1.59 4.8-.61 5.74m45.14-49.53s-7.61 5.47-15.73 12.91c-7.45 6.83-12.39 12.17-13.07 13.41c-.72 1.33-.73 3.21-.17 4.17s1.8 1.46 2.93.62c1.13-.85 9.18-9.75 16.45-16.11c6.65-5.82 11.78-9.51 11.78-9.51s2.08-3.68 1.74-4.52c-.34-.85-3.93-.97-3.93-.97" /><path fill="#ed6a65" d="M84.95 20.13s5.62-4.31 11.74-7.34c5.69-2.82 11.35-5.17 12.37-3.13c.97 1.94-5.37 4.58-10.95 8.14s-10.95 7.81-10.95 7.81s-.82-1.5-1.35-2.89a24 24 0 0 1-.86-2.59" /><path fill="#e1e1e1" d="M89.59 39.25c-5.57-5.13-13.32-3.75-17.14.81c-3.92 4.7-3.63 11.88 1 16.2c4.21 3.92 12.04 4.81 16.76-.69c4.2-4.88 3.94-12.13-.62-16.32" /><path fill="#3f545f" d="M75.33 41.87c-3.31 3.25-3.13 9.69.81 12.63c3.44 2.57 8.32 2.44 11.38-.69s3.06-8.82.19-11.76c-3.3-3.37-8.59-3.9-12.38-.18" /><path fill="#a02524" d="M50 76.89s6.19-6.28 6.87-5.6s.59 4.49-2.37 8.73C51.53 84.26 45 91.81 39.83 96.9c-5.1 5.01-12.29 10.74-12.97 10.64c-.53-.08-2.68-1.15-3.54-2.19c-.84-1.03 1.67-5.9 2.68-7.51c1.02-1.61 24-20.95 24-20.95" /><path fill="#ca2c31" d="M21.23 101.85c-.08 1.44 2.12 3.54 2.12 3.54L56.87 71.3s-1.57-1.77-6.19 1.1c-4.66 2.9-8.74 6.38-14.76 12.21c-8.39 8.14-14.61 15.8-14.69 17.24" /><path fill="#fff" d="M19.06 36.95c-1.11 1.11-1.16 2.89.08 3.91c1.1.91 2.89.32 3.56-.5s.59-2.6-.3-3.48c-.89-.89-2.66-.6-3.34.07" /><path fill="#fff" d="M41.02 35.65c-.84.93-.57 2.31.21 2.82s1.95.46 2.52-.24c.51-.63.57-1.89-.21-2.67c-.68-.67-1.98-.51-2.52.09" opacity="0.5" /><path fill="#fff" d="M55.55 11.89s1.22-3.48 1.94-3.52c.73-.04 1.78 3.48 1.78 3.48s3.61.04 3.85.57c.31.68-2.31 2.96-2.31 2.96s.85 3.4.45 3.81c-.45.45-3.56-1.34-3.56-1.34s-3.2 2.23-3.89 1.62c-.6-.53.65-4.13.65-4.13s-3-2.19-2.84-2.8c.23-.86 3.93-.65 3.93-.65m41.46 83.44c1.21.67 2.73.29 3.29-1c.51-1.15-.43-2.52-1.28-2.89s-2.34.12-2.88 1.09c-.53.96.14 2.4.87 2.8m17.18-29.49c-.69-1.07-2.18-1.42-3.15-.56c-.94.84-.71 2.16-.18 2.83s1.95.92 2.81.37s.94-2 .52-2.64" /></svg>
+                    Beta version out
+                    <svg className="size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m16 8.4l-8.9 8.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7L14.6 7H7q-.425 0-.712-.288T6 6t.288-.712T7 5h10q.425 0 .713.288T18 6v10q0 .425-.288.713T17 17t-.712-.288T16 16z" /></svg>
+                </span>
+            </section>
 
             {/* Hero Section */}
-            <section className="flex flex-col items-center justify-center flex-1 py-16 px-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
-                <h1 className="text-5xl font-bold text-slate-900 text-center mb-4">
-                    Manage Your Teams, Assign Tasks, Track Progress
-                </h1>
-                <p className="text-xl text-slate-600 text-center mb-8 max-w-2xl">
-                    TaskTeams gives managers a clear overview of every team, every member, and every task. Assign work, monitor progress, and keep your teams aligned—all in one powerful dashboard.
-                </p>
-                <form className="flex flex-col sm:flex-row gap-3 w-full max-w-md mb-8">
-                    <input
-                        type="email"
-                        placeholder="Enter your work email"
-                        className="flex-1 px-4 py-3 rounded border border-slate-300"
-                    />
-                    <button className="bg-gradient-to-r from-blue-500 via-indigo-500 to-green-400 text-white px-6 py-3 rounded font-semibold transition hover:from-blue-600 hover:via-indigo-600 hover:to-green-500">
-                        Try for free
+            <section className="flex flex-col items-center justify-center w-full px-4 mt-8">
+                <div className="max-w-2xl w-full flex flex-col items-center">
+                    <h1 className="text-4xl sm:text-5xl text-center mt-4 mb-4 pb-4 border-b border-slate-300 font-bold">
+                        Manage Your Teams, Assign Tasks, Track Progress
+                    </h1>
+                    <h2 className="text-slate-600 text-lg sm:text-xl text-center">
+                        TaskTeams gives managers a clear overview of every team, every member, and every task. Assign work, monitor progress, and keep your teams aligned—all in one powerful dashboard.
+                    </h2>
+                </div>
+            </section>
+
+            {/* Mockup Image Section */}
+            <section className="flex items-center justify-center w-full mt-8">
+                <Image
+                    className="border-2 border-gray-300 p-1 bg-slate-200 shadow-2xl rounded-xl"
+                    height={400}
+                    width={650}
+                    alt="TaskTeams dashboard mockup"
+                    src="/tasks-teams-mockup.png"
+                    priority
+                />
+            </section>
+
+            {/* Call to Action Section */}
+            <section className="flex flex-col items-center justify-center w-full mt-10 mb-6 px-4">
+                <div className="max-w-xl w-full flex flex-col items-center gap-6">
+                    <h1 className="text-3xl sm:text-4xl text-center font-semibold">
+                        Start your journey <br /> with TaskTeams
+                    </h1>
+                    <button
+                        onClick={() => router.push("/auth/login")}
+                        className="cursor-pointer text-base px-8 py-4 rounded-3xl bg-white hover:bg-slate-50 shadow font-medium transition"
+                    >
+                        GET STARTED
                     </button>
-                </form>
-                <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-4xl mx-auto mt-8">
-                    <div className="flex flex-col items-center w-full md:w-1/2">
-                        <Image
-                            src="/tasks-desktop.png"
-                            alt="Manager Dashboard - Teams Overview"
-                            width={420}
-                            height={260}
-                            className="rounded-xl shadow border border-slate-200 w-full object-cover"
-                            style={{ maxWidth: 420, height: "auto" }}
-                        />
-                        <span className="mt-3 text-slate-500 text-center text-sm">Manager Dashboard – Teams Overview</span>
-                    </div>
-                    <div className="flex flex-col items-center w-full md:w-1/2">
-                        <Image
-                            src="/tasks-mobile.png"
-                            alt="Team Progress Tracking"
-                            width={220}
-                            height={160}
-                            className="rounded-xl shadow border border-slate-200 w-full object-cover"
-                            style={{ maxWidth: 220, height: "auto" }}
-                        />
-                        <span className="mt-3 text-slate-500 text-center text-sm">Team Progress Tracking (Mobile)</span>
-                    </div>
-                </div>
-
-            </section>
-
-            {/* Testimonials */}
-            <section className="py-8 px-4 bg-white">
-                <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-center items-stretch gap-8">
-                    <div className="flex flex-col justify-between items-center min-h-[100px]">
-                        <span className="italic text-lg text-slate-700 mb-2 text-center">
-                            “I can see every team’s workload and progress at a glance.”
-                        </span>
-                        <Image src="/forbes-logo.png" alt="Forbes" width={80} height={24} />
-                    </div>
-                    <div className="flex flex-col justify-between items-center min-h-[100px]">
-                        <span className="italic text-lg text-slate-700 mb-2 text-center">
-                            “Assigning and tracking tasks for my teams has never been easier.”
-                        </span>
-                        <Image src="/techcrunch-logo.png" alt="TechCrunch" width={80} height={24} />
-                    </div>
-                    <div className="flex flex-col justify-between items-center min-h-[100px]">
-                        <span className="italic text-lg text-slate-700 mb-2 text-center">
-                            “TaskTeams keeps my teams focused and accountable.”
-                        </span>
-                        <Image src="/wired-logo.png" alt="Wired" width={80} height={24} />
-                    </div>
                 </div>
             </section>
 
-            {/* Features Section */}
-            <section className="py-16 px-4 bg-indigo-50">
-                <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <div className="flex flex-col items-center">
-                        <Image src="/collaborate-icon.png" alt="Teams Overview" width={60} height={60} />
-                        <h3 className="font-semibold text-lg mt-4 mb-2">All Teams, One Dashboard</h3>
-                        <p className="text-slate-500 text-center">
-                            Instantly view all your teams, their members, and current workloads. Spot bottlenecks and balance assignments with ease.
-                        </p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <Image src="/assign-tasks.png" alt="Assign Tasks" width={60} height={60} />
-                        <h3 className="font-semibold text-lg mt-4 mb-2">Assign & Edit Tasks</h3>
-                        <p className="text-slate-500 text-center">
-                            Quickly assign tasks to team members, set priorities, and edit details as projects evolve.
-                        </p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <Image src="/track-icon.png" alt="Track Progress" width={60} height={60} />
-                        <h3 className="font-semibold text-lg mt-4 mb-2">Track Progress in Real Time</h3>
-                        <p className="text-slate-500 text-center">
-                            Monitor task completion, deadlines, and team performance with visual progress bars and reports.
-                        </p>
-                    </div>
+            {/* Footer (unchanged) */}
+            <footer
+                className="w-11/12 max-w-6xl mx-auto mb-8 rounded-4xl px-6 py-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-8"
+                style={{ background: "#2c2c2c", color: "#B6B09F" }}
+            >
+                {/* Logo Section */}
+                <div className="flex items-center gap-4 mb-6 md:mb-0">
+                    <img
+                        className="w-12 h-12"
+                        src="https://img.icons8.com/?size=100&id=2963&format=png&color=ffffff"
+                        alt="TaskTeams Logo"
+                    />
+                    <img
+                        className="w-12 h-12"
+                        src="https://img.icons8.com/?size=100&id=00FunGC1QVpi&format=png&color=ffffff"
+                        alt="Alternate Logo"
+                    />
                 </div>
-            </section>
-
-            {/* Stats Section */}
-            <section className="py-12 px-4 bg-white">
-                <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                    <div>
-                        <span className="text-3xl font-bold text-[#5d85bd]">2,500+</span>
-                        <p className="text-slate-500 mt-2">teams managed</p>
+                {/* Navigation Section */}
+                <nav className="flex-1 w-full">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                        <ul className="flex flex-col gap-2">
+                            <li className="font-bold text-white mb-1">Index</li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Explore</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Services</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">About</a>
+                            </li>
+                        </ul>
+                        <ul className="flex flex-col gap-2">
+                            <li className="font-bold text-white mb-1">Products</li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Supply</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">blablabla</a>
+                            </li>
+                        </ul>
+                        <ul className="flex flex-col gap-2">
+                            <li className="font-bold text-white mb-1">Resources</li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Feed</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Thoughts</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Stack</a>
+                            </li>
+                        </ul>
+                        <ul className="flex flex-col gap-2">
+                            <li className="font-bold text-white mb-1">Connect</li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Twitter</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Linkedin</a>
+                            </li>
+                            <li>
+                                <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Portfolio</a>
+                            </li>
+                        </ul>
                     </div>
-                    <div>
-                        <span className="text-3xl font-bold text-[#5d85bd]">120K+</span>
-                        <p className="text-slate-500 mt-2">tasks assigned</p>
-                    </div>
-                    <div>
-                        <span className="text-3xl font-bold text-[#5d85bd]">98%</span>
-                        <p className="text-slate-500 mt-2">on-time completion</p>
-                    </div>
-                    <div>
-                        <span className="text-3xl font-bold text-[#5d85bd]">4.9/5</span>
-                        <p className="text-slate-500 mt-2">manager rating</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Call to Action */}
-            <section className="py-16 px-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex flex-col items-center">
-                <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">
-                    Take control of your teams and projects today
-                </h2>
-                <p className="text-lg text-slate-600 mb-8 text-center">
-                    Join thousands of managers who trust TaskTeams to keep their teams productive and accountable.
-                </p>
-                <Link
-                    href="/teams"
-                    className="bg-gradient-to-r from-blue-500 via-indigo-500 to-green-400 text-white px-8 py-4 rounded-lg font-semibold text-xl shadow hover:from-blue-600 hover:via-indigo-600 hover:to-green-500 transition"
-                >
-                    Get Started Free
-                </Link>
-            </section>
-
-            {/* Footer */}
-            <footer className="w-full py-6 text-center text-slate-400 text-sm mt-12">
-                &copy; {new Date().getFullYear()} TaskTeams. All rights reserved.
+                </nav>
             </footer>
         </main>
     );

@@ -6,8 +6,7 @@ import { notFound } from "next/navigation";
 const STAGES = ["Not Started", "In Progress", "Completed"];
 
 export default function TeamPage({ params }) {
-    const unwrappedParams = React.use(params);
-    const id = unwrappedParams.id;
+    const { id } = React.use(params);
 
     const [team, setTeam] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -141,8 +140,9 @@ export default function TeamPage({ params }) {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <span className="text-gray-500 text-lg">Loading...</span>
+            <div className="flex flex-col items-center min-h-screen bg-gray-50 justify-center">
+                <div className="loader1 mb-4"></div>
+                <div className="text-lg text-gray-600">Loading tasks...</div>
             </div>
         );
     }
@@ -181,7 +181,7 @@ export default function TeamPage({ params }) {
                     </Link>
                     <button
                         className={`cursor-pointer px-5 py-2 rounded-lg font-semibold transition-colors shadow
-                                    ${showAddForm ? "bg-red-500 text-white hover:bg-red-600" : "bg-green-600 text-white hover:bg-green-700"}`}
+                                    ${showAddForm ? "bg-green-500 text-white hover:bg-red-600" : "bg-green-600 text-white hover:bg-green-700"}`}
                         onClick={() => setShowAddForm(true)}
                     >
 
@@ -196,14 +196,14 @@ export default function TeamPage({ params }) {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70">
                         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-md border border-gray-200 relative">
                             <button
-                                className="cursor-pointer absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+                                className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
                                 onClick={() => setShowAddForm(false)}
                                 aria-label="Close"
                                 type="button"
                             >
                                 &times;
                             </button>
-                            <h2 className="text-xl font-bold mb-4 text-slate-800">Add New Task</h2>
+                            <h2 className="underline underline-offset-2 text-xl font-bold mb-4 text-slate-800">Add New Task</h2>
                             <form onSubmit={handleAddTask} className="flex flex-col gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
@@ -299,19 +299,19 @@ export default function TeamPage({ params }) {
                     <table className="min-w-full border-collapse text-sm shadow">
                         <thead className="bg-slate-100">
                             <tr>
-                                <th className="p-4 border-b border-gray-200 text-left">#</th>
-                                <th className="p-4 border-b border-gray-200 text-left">Task Title</th>
-                                <th className="p-4 border-b border-gray-200 text-left">Status</th>
-                                <th className="p-4 border-b border-gray-200 text-left">Actions</th>
+                                <th className="p-4 border-b border-r border-gray-200 text-left">#</th>
+                                <th className="p-4 border-b border-r border-gray-200 text-left">Task Title</th>
+                                <th className="p-4 border-b border-r border-gray-200 text-left">Status</th>
+                                <th className="p-4 border-b border-gray-200 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {(team.tasks && team.tasks.length > 0) ? (
                                 team.tasks.map((task, idx) => (
                                     <tr key={task.id || task._id} className="even:bg-gray-50">
-                                        <td className="p-4 border-b border-gray-100">{idx + 1}</td>
-                                        <td className="p-4 border-b border-gray-100">{task.title}</td>
-                                        <td className={`p-4 border-b border-gray-100 ${getStatusClasses(task.status)}`}>
+                                        <td className="p-4 border-b border-r border-gray-100">{idx + 1}</td>
+                                        <td className="p-4 border-b border-r border-gray-100">{task.title}</td>
+                                        <td className={`p-4 border-b border-r border-gray-100 ${getStatusClasses(task.status)}`}>
                                             <span
                                                 className={`inline-block w-3 h-3 rounded-full mr-2 align-middle ${getDotColor(task.status)}`}
                                             />
@@ -344,13 +344,13 @@ export default function TeamPage({ params }) {
                             <div key={task.id || task._id} className="bg-white rounded-xl shadow border border-gray-200 p-4 flex flex-col gap-2">
                                 <div className="flex justify-between items-center">
                                     <div className="font-medium text-slate-700">{task.title}</div>
-                                    <span className={`ml-2 px-2 py-1 rounded text-xs ${getStatusClasses(task.status)}`}>
+                                    <span className={`flex items-center justify-between ml-2 px-2 py-1 rounded text-xs ${getStatusClasses(task.status)}`}>
                                         <span className={`inline-block w-2 h-2 rounded-full mr-1 align-middle ${getDotColor(task.status)}`} />
                                         {task.status}
                                     </span>
                                 </div>
                                 <button
-                                    className="flex items-center justify-center gap-2 cursor-pointer px-2 py-1 rounded bg-yellow-400 text-white font-semibold hover:bg-yellow-500 transition text-xs"
+                                    className="flex items-center justify-center gap-2 cursor-pointer px-2 py-1.5 rounded bg-yellow-400 text-white font-semibold hover:bg-yellow-500 transition text-s"
                                     onClick={() => openEditModal(idx)}
                                 >
                                     <img style={{ height: "15px" }} src="https://img.icons8.com/?size=100&id=9fYfwBJNoMpV&format=png&color=ffffff" alt="" /> Edit
