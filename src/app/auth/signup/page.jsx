@@ -44,7 +44,7 @@ export default function SignUp() {
                 return;
             }
 
-            router.push("/auth/login");
+            router.replace("/auth/login");
         } catch (err) {
             setError("Something went wrong. Please try again.");
             setLoading(false);
@@ -60,7 +60,7 @@ export default function SignUp() {
                     <div className="flex flex-col items-center">
                         <Image
                             onClick={() => router.push('/')}
-                            src="/tasks-teams.png"
+                            src="/team-tasks.png"
                             alt="TaskTeams Logo"
                             width={48}
                             height={48}
@@ -74,7 +74,7 @@ export default function SignUp() {
                             </Link>
                         </p>
 
-                        {/* Google Sign Up Button */}
+
                         <button
                             type="button"
                             className="w-full cursor-pointer bg-white border border-gray-300 shadow-sm hover:bg-gray-100 focus:ring-2 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-center mb-4 transition"

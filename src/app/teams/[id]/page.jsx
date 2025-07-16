@@ -118,6 +118,10 @@ export default function TeamPage({ params }) {
 
     async function handleDeleteTask() {
         if (editIdx === null) return;
+        // Show confirm dialog and check result
+        const confirmed = window.confirm('Are you sure you want to delete the task?');
+        if (!confirmed) return; // Exit if user cancels
+
         try {
             const taskId = team.tasks[editIdx].id || team.tasks[editIdx]._id;
             const res = await fetch(`/api/teams/${id}/tasks/${taskId}`, {
@@ -137,6 +141,7 @@ export default function TeamPage({ params }) {
             alert("Failed to delete task");
         }
     }
+
 
     if (loading) {
         return (
@@ -159,18 +164,18 @@ export default function TeamPage({ params }) {
                     href="/teams"
                     className="inline-block px-3 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
                 >
-                    ← Back
+                    ←
                 </Link>
-                <span className="font-bold text-indigo-700 text-lg">{team.name}</span>
+                {/* <span className="font-bold text-[#000] text-lg">{team.name}</span> */}
                 <button
                     className="cursor-pointer px-4 py-2 rounded-lg font-semibold transition-colors shadow bg-green-600 text-white hover:bg-green-700 text-sm"
                     onClick={() => setShowAddForm(true)}
                 >
-                    Add Task
+                    +
                 </button>
             </div>
 
-            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-200 mt-16 md:mt-0">
+            <div className="w-19/20 max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-200 mt-16 md:mt-0">
                 {/* Desktop header */}
                 <div className="hidden md:flex justify-between items-center mb-8">
                     <Link
@@ -243,14 +248,14 @@ export default function TeamPage({ params }) {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70">
                         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-md border border-gray-200 relative">
                             <button
-                                className="cursor-pointer absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+                                className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
                                 onClick={() => setShowEditForm(false)}
                                 aria-label="Close"
                                 type="button"
                             >
                                 &times;
                             </button>
-                            <h2 className="text-xl font-bold mb-4 text-slate-800">Edit Task</h2>
+                            <h2 className="text-xl font-bold underline underline-offset-2 mb-4 text-slate-800">Edit Task</h2>
                             <form onSubmit={handleEditTask} className="flex flex-col gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
@@ -276,18 +281,21 @@ export default function TeamPage({ params }) {
                                 </div>
                                 <div className="flex gap-2 mt-2">
                                     <button
-                                        type="submit"
-                                        className="flex-1 cursor-pointer px-4 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
-                                    >
-                                        Save Changes
-                                    </button>
-                                    <button
                                         type="button"
-                                        className="flex-1 cursor-pointer px-4 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+                                        className="flex items-center justify-center gap-1 flex-1 cursor-pointer px-4 py-2 rounded bg-red-500 text-white font-semibold hover:bg-red-700 transition"
                                         onClick={handleDeleteTask}
                                     >
-                                        Delete
+                                        <svg className="h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17" /></svg>
+                                        Delete Task
                                     </button>
+                                    <button
+                                        type="submit"
+                                        className="flex items-center justify-center gap-1 flex-1 cursor-pointer px-4 py-2 rounded bg-indigo-500 text-white font-semibold hover:bg-indigo-700 transition"
+                                    >
+                                        <svg className="h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" fillRule="evenodd"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" /><path fill="currentColor" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6.414A2 2 0 0 0 19.414 5L17 2.586A2 2 0 0 0 15.586 2zm10.238 8.793a1 1 0 1 0-1.414-1.414l-4.242 4.243l-1.415-1.415a1 1 0 0 0-1.414 1.414l2.05 2.051a1.1 1.1 0 0 0 1.556 0l4.88-4.879Z" /></g></svg>
+                                        Save Changes
+                                    </button>
+
                                 </div>
                             </form>
                         </div>

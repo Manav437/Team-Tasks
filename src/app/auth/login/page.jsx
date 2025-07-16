@@ -54,7 +54,7 @@ export default function LoginPage() {
                     <div className="flex flex-col items-center">
                         <Image
                             onClick={() => router.push('/')}
-                            src="/tasks-teams.png"
+                            src="/team-tasks.png"
                             alt="TaskTeams Logo"
                             width={48}
                             height={48}
