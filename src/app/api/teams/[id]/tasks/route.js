@@ -7,7 +7,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const prisma = new PrismaClient();
 
 export async function POST(request, { params }) {
-    const { id: teamId } = params;
+    const { id: teamId } = await params;
     try {
         // Get the current session and user
         const session = await getServerSession(authOptions);

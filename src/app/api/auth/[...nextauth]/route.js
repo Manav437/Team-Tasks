@@ -1,3 +1,5 @@
+// app/api/auth/[...nextauth]/route.js
+
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -5,7 +7,12 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+// Prisma singleton pattern for Next.js
+let prisma;
+if (!global.prisma) {
+    global.prisma = new PrismaClient();
+}
+prisma = global.prisma;
 
 export const authOptions = {
     adapter: PrismaAdapter(prisma),
@@ -24,14 +31,15 @@ export const authOptions = {
                 const user = await prisma.user.findUnique({
                     where: { email: credentials.email },
                 });
-                if (!user || !user.password) return null;
+                if (!user || !user.password) {
+                    // Throw an error to show a message on the client
+                    throw new Error("No user found. Please sign up first.");
+                }
                 const isValid = await bcrypt.compare(credentials.password, user.password);
-                if (!isValid) return null;
-                return {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                };
+                if (!isValid) {
+                    throw new Error("Invalid credentials");
+                }
+                return user;
             },
         }),
     ],
@@ -43,14 +51,14 @@ export const authOptions = {
         signIn: "/auth/login",
     },
     callbacks: {
-        async signIn({ user, account, profile, email, credentials }) {
-            // Only allow sign in if the email is verified (for Google)
-            if (account.provider === "google" && !profile.email_verified) {
+        async signIn({ user, account, profile }) {
+            if (account.provider === "google" && profile && !profile.email_verified) {
                 return false;
             }
             return true;
         },
         async session({ session, token, user }) {
+            // Optionally add user id or other fields to session
             return session;
         },
     },

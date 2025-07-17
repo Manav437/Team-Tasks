@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const prisma = new PrismaClient();
 
 export async function PUT(request, { params }) {
-    const { id: teamId, taskId } = params;
+    const { id: teamId, taskId } = await params;
     try {
         // Get the current session and user
         const session = await getServerSession(authOptions);
@@ -58,7 +58,7 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-    const { id: teamId, taskId } = params;
+    const { id: teamId, taskId } = await params;
     try {
         const session = await getServerSession(authOptions);
         if (!session || !session.user?.email) {

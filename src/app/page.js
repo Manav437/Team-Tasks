@@ -8,20 +8,46 @@ import "./globals.css";
 const sliderImages = [
     "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Logitech_logo.svg/1024px-Logitech_logo.svg.png",
     "https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Esports_organization_Fnatic_logo.svg/1200px-Esports_organization_Fnatic_logo.svg.png",
-    "https://img.icons8.com/?size=100&id=30888&format=png&color=000000",
     "https://owcdn.net/img/62bbeba74d5cb.png",
+    "https://img.icons8.com/?size=100&id=30888&format=png&color=000000",
     "https://upload.wikimedia.org/wikipedia/commons/1/16/100_Thieves_logo.svg",
     "https://1000logos.net/wp-content/uploads/2021/04/Pirelli-logo.png",
     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Sentinels_logo.svg/1200px-Sentinels_logo.svg.png",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Cloud9_logo_c._2023.svg/640px-Cloud9_logo_c._2023.svg.png",
-    "https://upload.wikimedia.org/wikipedia/en/1/12/Esports_organization_G2_Esports_logo.svg",
     "https://doctorhead.ru/upload/dev2fun.imagecompress/webp/resize_cache/iblock/91f/smf06uteq7yibiyolyup3o2xslzbkwsn/320_198_2/pulsar_320.webp",
-    "https://upload.wikimedia.org/wikipedia/commons/8/83/MSC_Cruises_Logo.png"
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Cloud9_logo_c._2023.svg/640px-Cloud9_logo_c._2023.svg.png",
+    "https://upload.wikimedia.org/wikipedia/commons/8/83/MSC_Cruises_Logo.png",
+    "https://upload.wikimedia.org/wikipedia/en/1/12/Esports_organization_G2_Esports_logo.svg",
 ]
+
+const faqContent = [
+    {
+        question: "What is TaskPilot?",
+        answer: "TaskPilot is a platform that helps managers assign tasks, track progress, and manage teams efficiently from a single dashboard."
+    },
+    {
+        question: "How do I add a new team member?",
+        answer: "Go to your team dashboard, click 'Add Member', and enter the new member’s details to invite them to your team."
+    },
+    {
+        question: "Can I assign tasks to multiple team members?",
+        answer: "Yes, you can assign a single task to one or more team members when creating or editing a task."
+    },
+    {
+        question: "How do I track the progress of my team?",
+        answer: "Use the dashboard to view real-time updates on task completion, team activity, and overall project progress."
+    },
+];
+
 
 export default function Home() {
     const [menuOpen, setMenuOpen] = useState(false);
     const router = useRouter();
+
+    const [openIndex, setOpenIndex] = useState(0);
+
+    const toggle = (index) => {
+        setOpenIndex(openIndex === index ? null : index);
+    };
 
     return (
         <main className="flex flex-col min-h-screen bg-[url('/landing-page-bg.png')]">
@@ -39,31 +65,31 @@ export default function Home() {
                         priority
                     />
 
-                    <span style={{ color: "black", fontFamily: "JetBrains Mono" }} className="text-[23px]">TaskTeams</span>
+                    <span style={{ color: "black", fontFamily: "JetBrains Mono" }} className="text-[23px]">TaskPilot</span>
                 </div>
 
                 {/* Desktop nav links */}
-                <div className="hidden sm:flex items-center gap-4">
+                <div className="hidden sm:flex items-center gap-4 text-gray-600">
                     <Link
-                        className="hover:bg-blue-200 rounded-lg px-2 py-1 transition-all duration-300"
-                        href="/"
+                        className="hover:underline underline-offset-4 hover:text-[#000] hover:scale-x-103 px-2 py-1 ease-in-out transition duration-300"
+                        href="#"
                     >
                         Pricing
                     </Link>
                     <Link
-                        className="hover:bg-blue-200 rounded-lg px-2 py-1 transition-all duration-300"
-                        href="/"
+                        className="hover:underline underline-offset-4 hover:text-[#000] hover:scale-x-103 px-2 py-1 transition-all ease-in-out duration-300"
+                        href="#"
                     >
                         Blogs
                     </Link>
                     <Link
-                        className="hover:bg-green-200 rounded-lg px-2 py-1 transition-all duration-300"
+                        className="hover:underline underline-offset-4 hover:text-[#000] hover:scale-x-103 px-2 py-1 transition-all ease-in-out duration-300"
                         href="/auth/login"
                     >
                         Log In
                     </Link>
                     <Link
-                        className="hover:bg-green-200 rounded-lg px-2 py-1 transition-all duration-300"
+                        className="hover:underline underline-offset-4 hover:text-[#000] hover:scale-x-103 px-2 py-1 transition-all ease-in-out duration-300"
                         href="/auth/signup"
                     >
                         Sign Up
@@ -93,16 +119,16 @@ export default function Home() {
                 {/* Mobile menu */}
                 <nav
                     className={`
-    absolute top-0 left-0 rounded-b-4xl w-full bg-white shadow-lg z-50 sm:hidden
+    absolute top-0 left-0 rounded-b-3xl w-full bg-white shadow-lg z-50 sm:hidden
     transition-all duration-300 ease-in-out
     ${menuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-8 pointer-events-none"}
   `}
                 >
-                    <ul className="flex flex-col items-center gap-4 py-8">
+                    <ul className="flex flex-col items-center gap-4 py-10">
                         <li>
                             <Link
                                 href="/"
-                                className="block px-4 py-2 text-lg hover:bg-blue-100 rounded"
+                                className="block px-4 py-2 text-lg bg-blue-50 rounded"
                                 onClick={() => setMenuOpen(false)}
                             >
                                 Pricing
@@ -111,7 +137,7 @@ export default function Home() {
                         <li>
                             <Link
                                 href="/"
-                                className="block px-4 py-2 text-lg hover:bg-blue-100 rounded"
+                                className="block px-4 py-2 text-lg bg-blue-50 rounded"
                                 onClick={() => setMenuOpen(false)}
                             >
                                 Blogs
@@ -120,7 +146,7 @@ export default function Home() {
                         <li>
                             <Link
                                 href="/auth/login"
-                                className="block px-4 py-2 text-lg hover:bg-green-100 rounded"
+                                className="block px-4 py-2 text-lg bg-blue-50 rounded"
                                 onClick={() => setMenuOpen(false)}
                             >
                                 Log In
@@ -129,7 +155,7 @@ export default function Home() {
                         <li>
                             <Link
                                 href="/auth/signup"
-                                className="block px-4 py-2 text-lg hover:bg-green-100 rounded"
+                                className="block px-4 py-2 text-lg bg-blue-50 rounded"
                                 onClick={() => setMenuOpen(false)}
                             >
                                 Sign Up
@@ -142,7 +168,7 @@ export default function Home() {
             </header>
 
             {/* Beta Banner */}
-            <section className="w-full flex justify-center mt-2">
+            <section className="w-full flex justify-center mt-10">
                 <span onClick={() => router.push('/auth/login')} className="cursor-pointer text-sm flex items-center gap-2 w-fit bg-white rounded-4xl px-3 py-1 shadow transition-all duration-300 hover:gap-3 hover:bg-gray-100">
                     <span>🚀</span>
                     Beta version out.
@@ -151,13 +177,13 @@ export default function Home() {
             </section>
 
             {/* Hero Section */}
-            <section className="flex flex-col items-center justify-center w-full px-4 mt-8">
+            <section className="flex flex-col items-center justify-center w-full px-4 mt-4">
                 <div className="max-w-2xl w-full flex flex-col items-center">
                     <h1 className="text-4xl sm:text-5xl text-center mt-4 mb-4 pb-4 border-b border-slate-400 font-bold">
                         Manage Your Teams, Assign Tasks, Track Progress
                     </h1>
                     <h2 className="text-slate-600 text-lg sm:text-xl text-center">
-                        TaskTeams gives managers a clear overview of every team, every member, and every task. Assign work, monitor progress, and keep your teams aligned — all in one powerful dashboard.
+                        TaskPilot gives managers a clear overview of every team, every member, and every task. Assign work, monitor progress, and keep your teams aligned — all in one powerful dashboard.
                     </h2>
                 </div>
             </section>
@@ -165,9 +191,9 @@ export default function Home() {
 
             <section className="mt-10">
                 <div className="flex w-fit gap-4 mx-auto text-slate-700">
-                    <div className="text-slate-400">⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
+                    <div className="text-slate-400">⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
                     <span className="w-fit mx-auto">TRUSTED BY</span>
-                    <div className="text-slate-400">⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
+                    <div className="text-slate-400">⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
                 </div>
 
             </section>
@@ -194,20 +220,20 @@ export default function Home() {
                     height={400}
                     width={750}
                     alt="TaskTeams dashboard mockup"
-                    src="/tasks-teams-mockup.png"
+                    src="/taskteam-mockup-dashboard.png"
                     priority
                 />
             </section>
 
             {/* cta */}
-            <section className="flex flex-col items-center justify-center w-full mt-10 mb-10 px-4">
+            <section className="flex flex-col items-center justify-center w-full mt-10 mb-0 px-4">
                 <div className="max-w-xl w-full flex flex-col items-center gap-6">
                     <h1 className="text-3xl sm:text-4xl text-center font-semibold">
-                        Start your journey <br /> with TaskTeams
+                        Start your journey <br /> with TaskPilot
                     </h1>
                     <button
                         onClick={() => router.push("/auth/login")}
-                        className="cursor-pointer text-base px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 shadow font-medium transition"
+                        className="cursor-pointer text-base px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 hover:scale-102 hover:font-semibold shadow font-medium transition"
                     >
                         GET STARTED
                     </button>
@@ -215,28 +241,68 @@ export default function Home() {
             </section>
 
 
+            <section className="w-9/10 sm:w-1/2 mx-auto my-12">
+                <h2 className="text-4xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
+                <div className="space-y-4">
+                    {faqContent.map((item, index) => (
+                        <div
+                            key={index}
+                            className="border border-gray-200 rounded-xl shadow-sm bg-white"
+                        >
+                            <button
+                                className={`cursor-pointer w-full flex justify-between items-center px-6 py-4 text-lg hover:bg-slate-200 rounded-lg font-medium border border-transparent ${openIndex == index ? "bg-slate-100 border-b border-b-slate-300 rounded-b-none" : ""} text-left focus:outline-none transition-all duration-300`}
+                                onClick={() => toggle(index)}
+                                aria-expanded={openIndex === index}
+                                aria-controls={`faq-answer-${index}`}
+                            >
+                                <span>{item.question}</span>
+                                <span
+                                    className="flex items-center justify-center ml-4 text-2xl transition-all duration-300"
+                                >
+                                    {openIndex === index ? '–' : '+'}
+                                </span>
+                            </button>
+
+                            <div
+                                id={`faq-answer-${index}`}
+                                className={`overflow-hidden transition-all duration-500 px-6 ${openIndex === index
+                                    ? "max-h-40 opacity-100 py-2"
+                                    : "max-h-0 opacity-0 py-0"
+                                    }`}
+                                style={{ transitionProperty: "max-height, opacity, padding" }}
+                                aria-hidden={openIndex !== index}
+                            >
+                                <div className="text-gray-600 py-3">{item.answer}</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
             <footer
                 className="w-11/12 max-w-6xl mx-auto mb-8 rounded-3xl px-6 py-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-8"
                 style={{ background: "#2c2c2c", color: "#B6B09F" }}
             >
                 {/* Logo Section */}
                 <div className="flex items-center gap-4 mb-6 md:mb-0">
-                    <img
+                    <Image alt="globe-footer-icon" height={45} width={45} src="/footer-icon-1.png" />
+                    {/* <img
                         className="w-12 h-12"
                         src="https://img.icons8.com/?size=100&id=2963&format=png&color=ffffff"
                         alt="TaskTeams Logo"
-                    />
-                    <img
+                    /> */}
+                    <Image alt="taskpilot-icon" height={45} width={45} src="/footer-icon-2.png" />
+                    {/* <img
                         className="w-12 h-12"
                         src="https://img.icons8.com/?size=100&id=00FunGC1QVpi&format=png&color=ffffff"
                         alt="Alternate Logo"
-                    />
+                    /> */}
                 </div>
                 {/* Navigation Section */}
                 <nav className="flex-1 w-full">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                         <ul className="flex flex-col gap-2 items-center">
-                            <li className="font-bold text-white mb-1">Index</li>
+                            <li className="font-bold text-white mb-1 underline underline-offset-4">Index</li>
                             <li>
                                 <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Explore</a>
                             </li>
@@ -248,7 +314,7 @@ export default function Home() {
                             </li>
                         </ul>
                         <ul className="flex flex-col gap-2 items-center">
-                            <li className="font-bold text-white mb-1">Products</li>
+                            <li className="font-bold text-white mb-1 underline underline-offset-4">Products</li>
                             <li>
                                 <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Supply</a>
                             </li>
@@ -257,7 +323,7 @@ export default function Home() {
                             </li>
                         </ul>
                         <ul className="flex flex-col gap-2 items-center">
-                            <li className="font-bold text-white mb-1">Resources</li>
+                            <li className="font-bold text-white mb-1 underline underline-offset-4">Resources</li>
                             <li>
                                 <a className="cursor-pointer hover:text-slate-300 transition-colors" href="#">Feed</a>
                             </li>
@@ -269,7 +335,7 @@ export default function Home() {
                             </li>
                         </ul>
                         <ul className="flex flex-col gap-2 items-center">
-                            <li className="font-bold text-white mb-1">Connect</li>
+                            <li className="font-bold text-white mb-1 underline underline-offset-4">Connect</li>
                             <li>
                                 <a className="cursor-pointer hover:text-slate-300 transition-colors" target="_blank" href="https://x.com/Manav437">Twitter</a>
                             </li>

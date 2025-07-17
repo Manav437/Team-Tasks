@@ -3,7 +3,7 @@
 body,html {
     padding: 0;
     margin: 0;
-    overscroll-behavior: none;
+    overscroll-behavior-y: none;
 }
 
 body {
@@ -30,7 +30,7 @@ body {
   animation: l33 1s infinite alternate;
 }
 .loader:before {
-  content:"Loading...";
+  content:"Loading";
   /* background: #2c2c2cdb; */
 }
 
@@ -121,4 +121,20 @@ body {
     animation: slider-left 17s linear infinite;
     will-change: transform;
   }
+}
+
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-animate-in {
+  animation: modalFadeIn 0.3s ease-out;
 }

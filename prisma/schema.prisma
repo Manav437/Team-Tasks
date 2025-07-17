@@ -58,6 +58,7 @@ model Team {
     name   String
     userId String   @db.ObjectId
     tasks  Task[]   @relation("TeamTasks")
+    createdAt DateTime @default(now())
 }
 
 
