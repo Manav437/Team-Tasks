@@ -1,10 +1,18 @@
+// src/app/teams/page.jsx
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Sidebar } from "../../components/Sidebar";
+import Select from "react-select";
 
 export default function TeamsPage() {
+    const STAGES = [
+        { value: "Not Started", label: "Not Started" },
+        { value: "In Progress", label: "In Progress" },
+        { value: "Completed", label: "Completed" }
+    ];
+
     const [teams, setTeams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -12,12 +20,10 @@ export default function TeamsPage() {
     const [showForm, setShowForm] = useState(false);
     const [teamName, setTeamName] = useState("");
     const [initialTaskTitle, setInitialTaskTitle] = useState("");
-    const [initialTaskStage, setInitialTaskStage] = useState("Not Started");
+    const [initialTaskStage, setInitialTaskStage] = useState(STAGES[0]);
 
     const [deletingTeamId, setDeletingTeamId] = useState(null);
-    const STAGES = ["Not Started", "In Progress", "Completed"];
 
-    // Pagination
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
@@ -51,7 +57,6 @@ export default function TeamsPage() {
             } else if (Array.isArray(data.teams)) {
                 setTeams(data.teams);
                 setTotalPages(data.totalPages || 1);
-                // setPage(data.page || 1);
             } else {
                 setTeams([]);
                 setTotalPages(1);
@@ -81,7 +86,7 @@ export default function TeamsPage() {
     async function handleAddTeam(e) {
         e.preventDefault();
         const tasks = initialTaskTitle.trim()
-            ? [{ title: initialTaskTitle, status: initialTaskStage }]
+            ? [{ title: initialTaskTitle, status: initialTaskStage.value }]
             : [];
         if (!teamName.trim()) return;
 
@@ -99,7 +104,7 @@ export default function TeamsPage() {
             setShowForm(false);
             setTeamName("");
             setInitialTaskTitle("");
-            setInitialTaskStage("Not Started");
+            setInitialTaskStage(STAGES[0]);
 
             fetchTeams(page, { silent: true });
         } catch (err) {
@@ -223,16 +228,22 @@ export default function TeamsPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Initial Task Stage</label>
-                                    <select
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                                    <Select
+                                        className="w-full"
+                                        options={STAGES}
                                         value={initialTaskStage}
-                                        onChange={(e) => setInitialTaskStage(e.target.value)}
-                                        disabled={!initialTaskTitle.trim()}
-                                    >
-                                        {STAGES.map((s) => (
-                                            <option key={s} value={s}>{s}</option>
-                                        ))}
-                                    </select>
+                                        onChange={setInitialTaskStage}
+                                        isDisabled={!initialTaskTitle.trim()}
+                                        placeholder="Select Stage"
+                                        styles={{
+                                            control: (base) => ({
+                                                ...base,
+                                                borderColor: "#d1d5db",
+                                                minHeight: "38px",
+                                                boxShadow: "none",
+                                            }),
+                                        }}
+                                    />
                                 </div>
                                 <button
                                     type="submit"
@@ -272,7 +283,6 @@ export default function TeamsPage() {
                                         <th className="p-4 border-b border-gray-200 border-r text-left">Team Name</th>
                                         <th className="p-4 border-b border-gray-200 border-r text-left">Task Title</th>
                                         <th className="p-4 border-b border-gray-200 border-r text-left">Stage</th>
-                                        {/* --- NEW: Actions column --- */}
                                         <th className="p-4 border-b border-gray-200  text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -409,7 +419,6 @@ export default function TeamsPage() {
                                                         {task.status}
                                                     </span>
                                                 </div>
-                                                {/* Separator after each task except the last */}
                                                 {idx < team.tasks.length - 1 && (
                                                     <hr className="my-2 border-t border-gray-200" />
                                                 )}

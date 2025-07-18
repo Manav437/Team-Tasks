@@ -27,10 +27,10 @@ export async function POST(request, { params }) {
             return NextResponse.json({ error: "Team not found or not owned by user" }, { status: 404 });
         }
 
-        const { title, status } = await request.json();
+        const { title, status, description } = await request.json();
 
-        if (!title || !status) {
-            return NextResponse.json({ error: "Title and status are required" }, { status: 400 });
+        if (!title || !status || !description) {
+            return NextResponse.json({ error: "Title, status, description are required" }, { status: 400 });
         }
 
         // Create the new task and link to the team
@@ -39,6 +39,7 @@ export async function POST(request, { params }) {
                 title,
                 status,
                 teamId,
+                description
             },
         });
 

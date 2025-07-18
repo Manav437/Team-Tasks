@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const prisma = new PrismaClient();
 
 export async function PUT(request, { params }) {
-    const { id: teamId, taskId } = await params;
+    const { id: teamId, taskId } = params; // Only get id and taskId from params
     try {
         // Get the current session and user
         const session = await getServerSession(authOptions);
@@ -34,7 +34,8 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: "Task not found or does not belong to this team" }, { status: 404 });
         }
 
-        const { title, status } = await request.json();
+        // Get update data from request body
+        const { title, status, description } = await request.json();
 
         if (!title || !status) {
             return NextResponse.json({ error: "Title and status are required" }, { status: 400 });
@@ -46,7 +47,7 @@ export async function PUT(request, { params }) {
             data: {
                 title,
                 status,
-                // teamId, // Only include if you want to allow moving tasks between teams
+                description
             },
         });
 

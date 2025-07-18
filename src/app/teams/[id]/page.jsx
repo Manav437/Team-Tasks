@@ -1,12 +1,47 @@
-// TeamPage.tsx
+// TeamPage.js
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import Select from 'react-select';
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const STAGES = ["Not Started", "In Progress", "Completed"];
 
+function getStatusClasses(status) {
+    if (status === "Not Started") return "text-gray-700";
+    if (status === "In Progress") return "text-yellow-800";
+    if (status === "Completed") return "text-green-800";
+    return "";
+}
+function getDotColor(status) {
+    if (status === "Not Started") return "bg-gray-400";
+    if (status === "In Progress") return "bg-yellow-400";
+    if (status === "Completed") return "bg-green-500";
+    return "";
+}
+
+const filterOptions = [
+    { value: "All", label: <span className="flex items-center"><span className="inline-block w-2 h-4 mr-1 align-middle bg-gray-300 rounded" />All Status</span> },
+    ...STAGES.map(s => ({
+        value: s,
+        label: (
+            <span className="flex items-center">
+                <span className={`inline-block w-2 h-4 mr-1 align-middle rounded ${getDotColor(s)}`} />
+                {s}
+            </span>
+        )
+    }))
+];
+
+const options = STAGES.map(s => ({
+    value: s,
+    label: (
+        <span className="flex items-center">
+            <span className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(s)}`} />
+            {s}
+        </span>
+    )
+}));
 
 export default function TeamPage({ params }) {
     const { id } = React.use(params);
@@ -19,25 +54,25 @@ export default function TeamPage({ params }) {
     const [showAddForm, setShowAddForm] = useState(false);
     const [title, setTitle] = useState("");
     const [status, setStatus] = useState(STAGES[0]);
+    const [description, setDescription] = useState("");
 
     // Edit Task Modal State
     const [showEditForm, setShowEditForm] = useState(false);
     const [editIdx, setEditIdx] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editStatus, setEditStatus] = useState(STAGES[0]);
+    const [editDescription, setEditDescription] = useState("");
 
-    function getStatusClasses(status) {
-        if (status === "Not Started") return "text-gray-700 bg-gray-100";
-        if (status === "In Progress") return "text-yellow-800 bg-yellow-100";
-        if (status === "Completed") return "text-green-800 bg-green-100";
-        return "";
-    }
-    function getDotColor(status) {
-        if (status === "Not Started") return "bg-gray-400";
-        if (status === "In Progress") return "bg-yellow-400";
-        if (status === "Completed") return "bg-green-500";
-        return "";
-    }
+    // Search and Filter State
+    const [search, setSearch] = useState("");
+    const [filterStatus, setFilterStatus] = useState("All");
+
+    // Collapsed state for each section
+    const [collapsed, setCollapsed] = useState({
+        "Not Started": false,
+        "In Progress": false,
+        "Completed": false,
+    });
 
     useEffect(() => {
         async function fetchTeam() {
@@ -64,12 +99,12 @@ export default function TeamPage({ params }) {
 
     async function handleAddTask(e) {
         e.preventDefault();
-        if (!title.trim()) return;
+        if (!title.trim() || !description.trim()) return;
         try {
             const res = await fetch(`/api/teams/${id}/tasks`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, status }),
+                body: JSON.stringify({ title, status, description }),
             });
             if (!res.ok) throw new Error("Failed to add task");
             const newTask = await res.json();
@@ -80,6 +115,7 @@ export default function TeamPage({ params }) {
             );
             setTitle("");
             setStatus(STAGES[0]);
+            setDescription("");
             setShowAddForm(false);
         } catch (err) {
             alert("Failed to add task");
@@ -92,18 +128,19 @@ export default function TeamPage({ params }) {
         setEditIdx(idx);
         setEditTitle(task.title);
         setEditStatus(task.status);
+        setEditDescription(task.description || "");
         setShowEditForm(true);
     }
 
     async function handleEditTask(e) {
         e.preventDefault();
-        if (editIdx === null || !editTitle.trim() || !team) return;
+        if (editIdx === null || !editTitle.trim() || !editDescription.trim() || !team) return;
         try {
             const taskId = team.tasks[editIdx].id || team.tasks[editIdx]._id;
             const res = await fetch(`/api/teams/${id}/tasks/${taskId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: editTitle, status: editStatus }),
+                body: JSON.stringify({ title: editTitle, status: editStatus, description: editDescription }),
             });
             if (!res.ok) throw new Error("Failed to update task");
             const updatedTask = await res.json();
@@ -117,6 +154,7 @@ export default function TeamPage({ params }) {
             setEditIdx(null);
             setEditTitle("");
             setEditStatus(STAGES[0]);
+            setEditDescription("");
         } catch (err) {
             alert("Failed to edit task");
         }
@@ -144,20 +182,19 @@ export default function TeamPage({ params }) {
             setEditIdx(null);
             setEditTitle("");
             setEditStatus(STAGES[0]);
+            setEditDescription("");
         } catch (err) {
             alert("Failed to delete task");
         }
     }
 
-    // For mobile: open edit modal with correct index
-    function openEditModalMobile(idx) {
-        openEditModal(idx);
-    }
-    // For mobile: delete task directly
-    async function handleDeleteTaskMobile(idx) {
-        setEditIdx(idx);
-        await handleDeleteTask();
-    }
+    // Toggle collapse for a section
+    const toggleCollapse = (stage) => {
+        setCollapsed(prev => ({
+            ...prev,
+            [stage]: !prev[stage]
+        }));
+    };
 
     if (loading) {
         return (
@@ -172,236 +209,280 @@ export default function TeamPage({ params }) {
         notFound();
     }
 
-    return (
-        <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-white py-8">
-            {/* mobile top bar */}
-            <div className="md:hidden fixed top-0 left-0 w-full z-40 bg-white border-b border-gray-200 shadow flex items-center justify-between px-4 h-14">
-                <Link
-                    href="/teams"
-                    className="inline-block px-3 py-1 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
-                >
-                    ←
-                </Link>
+    // Filter and search tasks
+    let filteredTasks = (team.tasks || []).filter((task) => {
+        const matchesStatus = filterStatus === "All" || task.status === filterStatus;
+        const matchesSearch =
+            task.title.toLowerCase().includes(search.toLowerCase()) ||
+            (task.description || "").toLowerCase().includes(search.toLowerCase());
+        return matchesStatus && matchesSearch;
+    });
 
-                <Image alt="team-tasks-logo" height={35} width={35} src='/team-tasks.png' />
-                <button
-                    className="cursor-pointer px-3 py-2 rounded-lg font-semibold transition-colors shadow bg-green-600 text-white hover:bg-green-700 text-sm"
-                    onClick={() => setShowAddForm(true)}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-.425 0-.712-.288T11 20v-7H4q-.425 0-.712-.288T3 12t.288-.712T4 11h7V4q0-.425.288-.712T12 3t.713.288T13 4v7h7q.425 0 .713.288T21 12t-.288.713T20 13h-7v7q0 .425-.288.713T12 21" /></svg>
-                </button>
+    // Group tasks by status
+    const tasksByStatus = {
+        "Not Started": [],
+        "In Progress": [],
+        "Completed": [],
+    };
+
+    filteredTasks.forEach((task, idx) => {
+        if (tasksByStatus[task.status]) {
+            // Find the original index in team.tasks for editing
+            const origIdx = team.tasks.findIndex(
+                t => (t.id || t._id) === (task.id || task._id)
+            );
+            tasksByStatus[task.status].push({ ...task, idx: origIdx });
+        }
+    });
+
+    // Helper to get the option object for a given status string
+    const getOptionByValue = (val) => options.find(opt => opt.value === val);
+
+    return (
+        <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-300 py-4 px-2">
+            <div className="w-full max-w-5xl mx-auto">
+                <div className="w-full max-w-5xl mx-auto mb-4">
+                    <div className="flex items-center justify-between">
+                        {/* Back Button */}
+                        <Link
+                            href="/teams"
+                            className="inline-block px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
+                        >
+                            ←
+                        </Link>
+                        {/* Heading */}
+                        <h1 className="flex-1 text-2xl underline underline-offset-2 font-bold text-center">
+                            {team.name}
+                        </h1>
+                        {/* Spacer for symmetry */}
+                        <div className="w-[48px]" /> {/* Adjust width to match the back button */}
+                    </div>
+                </div>
+
+                {/* Search and Filter Controls */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-center mb-4">
+                    <input
+                        type="text"
+                        className="focus:outline-none focus:border-slate-400 border-1 border-slate-300 rounded px-3 py-2 w-full sm:w-1/2"
+                        placeholder="Search tasks / description"
+                        value={search}
+                        onChange={e => {
+                            const value = e.target.value;
+                            setSearch(value);
+                            if (value.trim() !== '') {
+                                setCollapsed(true);
+                            }
+                        }}
+                    />
+
+                    <Select
+                        options={filterOptions}
+                        value={filterOptions.find(opt => opt.value === filterStatus)}
+                        onChange={opt => setFilterStatus(opt.value)}
+                        isSearchable
+                        className="caret-transparent w-full sm:w-1/4"
+                        classNamePrefix="react-select"
+                    />
+                </div>
+            </div>
+            <div className="w-full max-w-5xl flex flex-col md:flex-row items-start gap-4 justify-center">
+                {STAGES.map((stage) => (
+                    <div key={stage} className="flex-1 flex flex-col gap-2 w-full md:min-w-[250px]">
+                        <div className="flex items-center justify-between rounded-t-sm py-1 bg-slate-200">
+                            <span className={`flex items-center w-fit justify-between pl-2 py-1 rounded text-xs ${getStatusClasses(stage)}`}>
+                                <span className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(stage)}`} />
+                                {stage}
+                                <span className="ml-2 text-xs text-gray-500 font-semibold">
+                                    ({tasksByStatus[stage].length})
+                                </span>
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    aria-label={collapsed[stage] ? "Expand" : "Collapse"}
+                                    onClick={() => toggleCollapse(stage)}
+                                    className="cursor-pointer p-1 rounded hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <svg
+                                        className={`transition-transform duration-200 ${collapsed[stage] ? "rotate-180" : "rotate-0"}`}
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 20 20"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path d="M6 8L10 12L14 8" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    aria-label={`Add task to ${stage}`}
+                                    onClick={() => {
+                                        setStatus(stage);
+                                        setShowAddForm(true);
+                                    }}
+                                    className="p-1 mr-1 cursor-pointer rounded hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M12 5v14M5 12h14"
+                                            stroke="#555"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div
+                            className={`rounded-b-sm bg-slate-200 overflow-hidden transition-all duration-300 ${collapsed[stage] ? "max-h-0 p-0" : "min-h-36.5 pt-2"}`}
+                            style={{
+                                maxHeight: collapsed[stage] ? 0 : 1000, // Large enough for most lists
+                                paddingTop: collapsed[stage] ? 0 : undefined,
+                                paddingBottom: collapsed[stage] ? 0 : undefined,
+                            }}
+                        >
+                            {!collapsed[stage] && (
+                                <>
+                                    {tasksByStatus[stage].length === 0 && (
+                                        <div className="text-gray-400 text-center rounded-md p-1 bg-gray-100 mx-auto w-19/20 text-sm px-2 h-full">No tasks</div>
+                                    )}
+                                    <ul>
+                                        {tasksByStatus[stage].map((task, i) => (
+                                            <li
+                                                key={task.id || task._id || i}
+                                                className="flex mx-auto w-19/20 flex-col px-2 py-2 bg-slate-100 rounded shadow mb-2 cursor-pointer transition hover:bg-blue-50"
+                                                onClick={() => openEditModal(task.idx)}
+                                            >
+                                                <div className="flex items-center justify-between border-b border-slate-300">
+                                                    <span className="font-medium">{task.title}</span>
+                                                    <span className="hover:underline text-xs text-gray-400 hover:text-gray-600">Edit</span>
+                                                </div>
+                                                {task.description && (
+                                                    <div className="text-xs ml-1 text-gray-500 mt-1">{task.description}</div>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                ))}
             </div>
 
-            <div className="w-19/20 max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-200 mt-16 md:mt-0">
-                {/* Desktop header */}
-                <div className="hidden md:flex justify-between items-center mb-8">
-                    <Link
-                        href="/teams"
-                        className="inline-block px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
+            {/* modal add task */}
+            {showAddForm && (
+                <div className="fixed inset-0 bg-gray-400/40 bg-opacity-30 flex items-center justify-center z-50">
+                    <form
+                        className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-4 w-[90vw] max-w-md"
+                        onSubmit={handleAddTask}
                     >
-                        ← Back to Teams
-                    </Link>
-                    <button
-                        className={`cursor-pointer px-5 py-2 rounded-lg font-semibold transition-colors shadow
-              ${showAddForm
-                                ? "bg-green-500 text-white hover:bg-red-600"
-                                : "bg-green-600 text-white hover:bg-green-700"
-                            }`}
-                        onClick={() => setShowAddForm(true)}
-                    >
-                        + Add New Task
-                    </button>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold mb-2 text-center text-slate-800">{team.name}</h1>
-                <h2 className="text-lg sm:text-xl font-semibold mb-8 text-center text-slate-600">Assigned Tasks</h2>
-
-                {/* new task modal */}
-                {showAddForm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70">
-                        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-md border border-gray-200 relative modal-animate-in">
+                        <h2 className="text-lg font-bold">Add Task</h2>
+                        <input
+                            type="text"
+                            className="focus:outline-0 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
+                            placeholder="Task title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            required
+                        />
+                        <Select className="caret-transparent"
+                            options={options}
+                            value={getOptionByValue(status)}
+                            onChange={opt => setStatus(opt.value)}
+                            classNamePrefix="react-select"
+                        />
+                        <textarea
+                            className="focus:outline-0 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
+                            placeholder="Task description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+                        />
+                        <div className="flex gap-2 justify-end">
                             <button
-                                className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-                                onClick={() => setShowAddForm(false)}
-                                aria-label="Close"
                                 type="button"
+                                className="cursor-pointer px-3 py-1 rounded bg-gray-200"
+                                onClick={() => setShowAddForm(false)}
                             >
-                                &times;
+                                Cancel
                             </button>
-                            <h2 className="underline underline-offset-2 text-xl font-bold mb-4 text-slate-800">Add New Task</h2>
-                            <form onSubmit={handleAddTask} className="flex flex-col gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                                    <input
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                        placeholder="Task Title"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <select
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                        value={status}
-                                        onChange={(e) => setStatus(e.target.value)}
-                                    >
-                                        {STAGES.map((s) => (
-                                            <option key={s} value={s}>{s}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <button
+                                type="submit"
+                                className="cursor-pointer px-3 py-1 rounded bg-blue-600 text-white"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+
+            {/* modal edit task */}
+            {showEditForm && (
+                <div className="fixed inset-0 bg-gray-400/40 bg-opacity-30 flex items-center justify-center z-50">
+                    <form
+                        className="bg-white p-6 rounded shadow-md flex flex-col gap-4 w-[90vw] max-w-md"
+                        onSubmit={handleEditTask}
+                    >
+                        <h2 className="text-lg font-bold">Edit Task</h2>
+                        <input
+                            type="text"
+                            className="focus:outline-none border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
+                            placeholder="Task title"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            required
+                        />
+                        <Select className="focus:outline-none caret-transparent"
+                            options={options}
+                            value={getOptionByValue(editStatus)}
+                            onChange={opt => setEditStatus(opt.value)}
+                            classNamePrefix="react-select"
+                        />
+                        <textarea
+                            className="focus:outline-none border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
+                            placeholder="Task description"
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            required
+                        />
+                        <div className="flex gap-2 justify-between">
+                            <button
+                                type="button"
+                                className="cursor-pointer px-3 py-1 rounded bg-red-500 text-white"
+                                onClick={handleDeleteTask}
+                            >
+                                Delete
+                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    className="cursor-pointer px-3 py-1 rounded bg-gray-200"
+                                    onClick={() => setShowEditForm(false)}
+                                >
+                                    Cancel
+                                </button>
                                 <button
                                     type="submit"
-                                    className="cursor-pointer mt-2 px-4 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
+                                    className="cursor-pointer px-3 py-1 rounded bg-blue-600 text-white"
                                 >
-                                    Add Task
+                                    Save
                                 </button>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* edit task modal */}
-                {showEditForm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70">
-                        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-md border border-gray-200 relative modal-animate-in">
-                            <button
-                                className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-                                onClick={() => setShowEditForm(false)}
-                                aria-label="Close"
-                                type="button"
-                            >
-                                &times;
-                            </button>
-                            <h2 className="text-xl font-bold underline underline-offset-2 mb-4 text-slate-800">Edit Task</h2>
-                            <form onSubmit={handleEditTask} className="flex flex-col gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                                    <input
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                        placeholder="Task Title"
-                                        value={editTitle}
-                                        onChange={(e) => setEditTitle(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <select
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                        value={editStatus}
-                                        onChange={(e) => setEditStatus(e.target.value)}
-                                    >
-                                        {STAGES.map((s) => (
-                                            <option key={s} value={s}>{s}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="flex gap-2 mt-2">
-                                    <button
-                                        type="button"
-                                        className="hidden md:flex items-center justify-center gap-1 flex-1 cursor-pointer px-4 py-2 rounded bg-red-500 text-white font-semibold hover:bg-red-700 transition"
-                                        onClick={handleDeleteTask}
-                                    >
-                                        <svg className="h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17" /></svg>
-                                        Delete Task
-                                    </button>
-
-                                    <button
-                                        type="submit"
-                                        className="flex items-center justify-center gap-1 flex-1 cursor-pointer px-4 py-2 rounded bg-indigo-500 text-white font-semibold hover:bg-indigo-700 transition"
-                                    >
-                                        <svg className="h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" fillRule="evenodd"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" /><path fill="currentColor" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6.414A2 2 0 0 0 19.414 5L17 2.586A2 2 0 0 0 15.586 2zm10.238 8.793a1 1 0 1 0-1.414-1.414l-4.242 4.243l-1.415-1.415a1 1 0 0 0-1.414 1.414l2.05 2.051a1.1 1.1 0 0 0 1.556 0l4.88-4.879Z" /></g></svg>
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* desktop cards */}
-                <div className="hidden md:block overflow-x-auto rounded-xl">
-                    <table className="min-w-full border-collapse text-sm shadow">
-                        <thead className="bg-slate-100">
-                            <tr>
-                                <th className="p-4 border-b border-r border-gray-200 text-left">#</th>
-                                <th className="p-4 border-b border-r border-gray-200 text-left">Task Title</th>
-                                <th className="p-4 border-b border-r border-gray-200 text-left">Status</th>
-                                <th className="p-4 border-b border-gray-200 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {team.tasks && team.tasks.length > 0 ? (
-                                team.tasks.map((task, idx) => (
-                                    <tr key={task.id || task._id} className="even:bg-gray-50">
-                                        <td className="p-4 border-b border-r border-gray-100">{idx + 1}</td>
-                                        <td className="p-4 border-b border-r border-gray-100">{task.title}</td>
-                                        <td className={`p-4 border-b border-r border-gray-100 ${getStatusClasses(task.status)}`}>
-                                            <span
-                                                className={`inline-block w-3 h-3 rounded-full mr-2 align-middle ${getDotColor(task.status)}`}
-                                            />
-                                            {task.status}
-                                        </td>
-                                        <td className="flex items-center justify-center p-4 border-b border-gray-100">
-                                            <button
-                                                className="flex items-center justify-between gap-2 cursor-pointer px-2 py-1 rounded bg-yellow-400 text-white font-semibold hover:bg-yellow-500 transition"
-                                                onClick={() => openEditModal(idx)}
-                                            >
-                                                <img style={{ height: "15px" }} src="https://img.icons8.com/?size=100&id=9fYfwBJNoMpV&format=png&color=ffffff" alt="" /> Edit
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={4} className=" p-6 text-center text-gray-400 italic">
-                                        No tasks assigned yet.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* mobile cards */}
-                <div className="md:hidden w-full flex flex-col gap-4">
-                    {team.tasks && team.tasks.length > 0 ? (
-                        team.tasks.map((task, idx) => (
-                            <div key={task.id || task._id} className="bg-white rounded-xl shadow border border-gray-200 p-4 flex flex-col gap-2">
-                                <div className="flex items-start">
-                                    <span className="text-xs text-green-600">#{idx + 1}</span>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <div className="font-medium text-slate-700">{task.title}</div>
-                                    <span className={`flex items-center justify-between ml-2 px-2 py-1 rounded text-xs ${getStatusClasses(task.status)}`}>
-                                        <span className={`inline-block w-2 h-2 rounded-full mr-1 align-middle ${getDotColor(task.status)}`} />
-                                        {task.status}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span
-                                        onClick={() => openEditModalMobile(idx)}
-                                        className="cursor-pointer text-gray-500 hover:text-slate-800 underline underline-offset-2 text-sm"
-                                    >
-                                        Edit Details
-                                    </span>
-                                    <span
-                                        onClick={() => handleDeleteTaskMobile(idx)}
-                                        className="cursor-pointer underline underline-offset-2  text-red-500 hover:text-red-600 font-bold text-sm"
-                                    >
-                                        Delete
-                                    </span>
-                                </div>
                             </div>
-                        ))
-                    ) : (
-                        <div className="italic text-gray-400 mt-2 text-center">No tasks assigned yet.</div>
-                    )}
+                        </div>
+                    </form>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

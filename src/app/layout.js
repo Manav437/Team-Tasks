@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
     return (
         <html suppressHydrationWarning>
             <head>
-                <link rel="icon" type="image/png" sizes="32x32" href="/TaskTeams-favicon.png" />
+                <link rel="icon" href="/TaskTeams-favicon.png" type="image/png" sizes="32x32" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Upright:wght@300;400;500;600;700&display=swap" rel="stylesheet" />

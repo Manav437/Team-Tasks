@@ -7,12 +7,10 @@ const prisma = new PrismaClient();
 
 export async function GET(request) {
     try {
-        // --- PAGINATION LOGIC START ---
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get("page") || "1", 10);
         const limit = parseInt(searchParams.get("limit") || "10", 10);
         const skip = (page - 1) * limit;
-        // --- PAGINATION LOGIC END ---
 
         const session = await getServerSession(authOptions);
         if (!session || !session.user?.email) {
@@ -23,14 +21,13 @@ export async function GET(request) {
             return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
         }
 
-        // --- FETCH PAGINATED TEAMS AND TOTAL COUNT ---
         const [teams, total] = await Promise.all([
             prisma.team.findMany({
                 where: { userId: user.id },
                 include: { tasks: true },
                 skip,
                 take: limit,
-                // orderBy: { createdAt: "desc" }, // optional: newest first
+                // orderBy: { createdAt: "desc" }, // optional
             }),
             prisma.team.count({ where: { userId: user.id } }),
         ]);
