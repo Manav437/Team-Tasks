@@ -50,7 +50,7 @@ export default function TeamPage({ params }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Add Task Modal State
+
     const [showAddForm, setShowAddForm] = useState(false);
     const [title, setTitle] = useState("");
     const [status, setStatus] = useState(STAGES[0]);
@@ -63,11 +63,11 @@ export default function TeamPage({ params }) {
     const [editStatus, setEditStatus] = useState(STAGES[0]);
     const [editDescription, setEditDescription] = useState("");
 
-    // Search and Filter State
+
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
 
-    // Collapsed state for each section
+
     const [collapsed, setCollapsed] = useState({
         "Not Started": false,
         "In Progress": false,
@@ -188,7 +188,7 @@ export default function TeamPage({ params }) {
         }
     }
 
-    // Toggle collapse for a section
+
     const toggleCollapse = (stage) => {
         setCollapsed(prev => ({
             ...prev,
@@ -209,7 +209,7 @@ export default function TeamPage({ params }) {
         notFound();
     }
 
-    // Filter and search tasks
+
     let filteredTasks = (team.tasks || []).filter((task) => {
         const matchesStatus = filterStatus === "All" || task.status === filterStatus;
         const matchesSearch =
@@ -218,7 +218,7 @@ export default function TeamPage({ params }) {
         return matchesStatus && matchesSearch;
     });
 
-    // Group tasks by status
+
     const tasksByStatus = {
         "Not Started": [],
         "In Progress": [],
@@ -235,35 +235,34 @@ export default function TeamPage({ params }) {
         }
     });
 
-    // Helper to get the option object for a given status string
+
     const getOptionByValue = (val) => options.find(opt => opt.value === val);
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-300 py-4 px-2">
-            <div className="w-full max-w-5xl mx-auto">
-                <div className="w-full max-w-5xl mx-auto mb-4">
+            <div className="w-full max-w-6xl mx-auto">
+                <div className="w-full max-w-6xl mx-auto mb-4">
                     <div className="flex items-center justify-between">
-                        {/* Back Button */}
+
                         <Link
                             href="/teams"
                             className="inline-block px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
                         >
                             ←
                         </Link>
-                        {/* Heading */}
-                        <h1 className="flex-1 text-2xl underline underline-offset-2 font-bold text-center">
-                            {team.name}
+
+                        <h1 className="flex-1 text-black text-2xl font-bold text-center">
+                            Team : <span className="text-slate-700 underline underline-offset-2">{team.name}</span>
                         </h1>
-                        {/* Spacer for symmetry */}
-                        <div className="w-[48px]" /> {/* Adjust width to match the back button */}
+
+                        <div className="w-[48px]" />
                     </div>
                 </div>
 
-                {/* Search and Filter Controls */}
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-between items-center mb-4">
+                <div className="flex flex-row sm:flex-row gap-2 sm:gap-4 justify-between items-center mb-4">
                     <input
                         type="text"
-                        className="focus:outline-none focus:border-slate-400 border-1 border-slate-300 rounded px-3 py-2 w-full sm:w-1/2"
+                        className="focus:outline-none focus:border-slate-400 border-1 border-slate-300 rounded px-3 py-1.5 w-1/2 sm:w-1/3"
                         placeholder="Search tasks / description"
                         value={search}
                         onChange={e => {
@@ -280,12 +279,13 @@ export default function TeamPage({ params }) {
                         value={filterOptions.find(opt => opt.value === filterStatus)}
                         onChange={opt => setFilterStatus(opt.value)}
                         isSearchable
-                        className="caret-transparent w-full sm:w-1/4"
+                        className="rounded caret-transparent w-1/2 sm:w-1/3"
                         classNamePrefix="react-select"
                     />
                 </div>
             </div>
-            <div className="w-full max-w-5xl flex flex-col md:flex-row items-start gap-4 justify-center">
+
+            <div className="w-full max-w-6xl flex flex-col md:flex-row items-start gap-4 justify-center">
                 {STAGES.map((stage) => (
                     <div key={stage} className="flex-1 flex flex-col gap-2 w-full md:min-w-[250px]">
                         <div className="flex items-center justify-between rounded-t-sm py-1 bg-slate-200">
@@ -402,7 +402,7 @@ export default function TeamPage({ params }) {
                             classNamePrefix="react-select"
                         />
                         <textarea
-                            className="focus:outline-0 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
+                            className="focus:outline-0 min-h-25 max-h-50 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
                             placeholder="Task description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -450,7 +450,7 @@ export default function TeamPage({ params }) {
                             classNamePrefix="react-select"
                         />
                         <textarea
-                            className="focus:outline-none border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
+                            className="focus:outline-none min-h-25 max-h-50 border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
                             placeholder="Task description"
                             value={editDescription}
                             onChange={(e) => setEditDescription(e.target.value)}

@@ -1,4 +1,3 @@
-// src/app/api/teams/[id]/route.js
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
@@ -10,7 +9,7 @@ export async function GET(request, { params }) {
     const { id } = await params;
 
     try {
-        // Get the current session and user
+
         const session = await getServerSession(authOptions);
         if (!session || !session.user?.email) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,7 +40,7 @@ export async function DELETE(request, { params }) {
     const { id } = await params;
 
     try {
-        // Get the current session and user
+
         const session = await getServerSession(authOptions);
         if (!session || !session.user?.email) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -51,7 +50,7 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // Check if the team exists and belongs to the user
+
         const team = await prisma.team.findFirst({
             where: { id, userId: user.id },
         });
@@ -60,7 +59,7 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: "Team not found" }, { status: 404 });
         }
 
-        // Delete the team (and its tasks if you have cascading deletes set up)
+
         await prisma.team.delete({
             where: { id },
         });

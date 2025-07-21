@@ -7,7 +7,6 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-// Prisma singleton pattern for Next.js
 let prisma;
 if (!global.prisma) {
     global.prisma = new PrismaClient();
@@ -58,7 +57,6 @@ export const authOptions = {
             return true;
         },
         async session({ session, token, user }) {
-            // Optionally add user id or other fields to session
             return session;
         },
     },

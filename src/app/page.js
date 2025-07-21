@@ -188,7 +188,6 @@ export default function Home() {
                 </div>
             </section>
 
-
             <section className="mt-10">
                 <div className="flex w-fit gap-4 mx-auto text-slate-700">
                     <div className="text-slate-400">⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
@@ -211,7 +210,6 @@ export default function Home() {
                     ))}
                 </div>
             </section>
-
 
             {/* test image */}
             <section className="flex items-center justify-center w-full mt-8">

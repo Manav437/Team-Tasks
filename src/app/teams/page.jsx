@@ -1,10 +1,12 @@
-// src/app/teams/page.jsx
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Sidebar } from "../../components/Sidebar";
-import Select from "react-select";
+import SummaryModal from "@/components/summary-modal";
+import { AddTeamModal } from "@/components/add-team-modal";
+import { Pagination } from "../../components/pagination";
+import { NoTeamsModal } from "@/components/no-teams-modal";
 
 export default function TeamsPage() {
     const STAGES = [
@@ -27,6 +29,11 @@ export default function TeamsPage() {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
+
+    const [isSummarizing, setIsSummarizing] = useState(false);
+    const [summaryModalOpen, setSummaryModalOpen] = useState(false);
+    const [summaryContent, setSummaryContent] = useState("");
+
 
     const teamNameInputRef = useRef(null);
 
@@ -129,6 +136,48 @@ export default function TeamsPage() {
         }
     }
 
+    async function handleAISummary(team) {
+        setIsSummarizing(true);
+        setSummaryModalOpen(true); // Open immediately
+        setSummaryContent("");     // Clear old summary
+
+        try {
+            const res = await fetch("/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    prompt: `
+You are a project management assistant.
+
+Analyze the following team and respond in **Markdown** with:
+- A bold team name as a heading and underline, fit-content
+- A bullet summary of task progress
+- A bullet for risks or blockers
+- A bullet for suggested next actions
+
+Team Name: ${team.name}
+
+Tasks:
+${team.tasks.length > 0
+                            ? team.tasks.map(t => `- ${t.title}: ${t.status}`).join('\n')
+                            : "No tasks assigned."}
+
+Keep it concise and formatted nicely.
+`.trim()
+                }),
+            });
+
+            const { summary } = await res.json();
+            setSummaryContent(summary);
+
+        } catch (err) {
+            console.error("Failed to get AI summary:", err);
+            setSummaryContent("⚠️ Failed to generate summary.");
+        } finally {
+            setIsSummarizing(false);
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex flex-col items-center min-h-screen bg-gray-50 justify-center">
@@ -178,7 +227,8 @@ export default function TeamsPage() {
     return (
         <div className="flex min-h-screen min-w-screen bg-gradient-to-br from-slate-100 via-gray-50 to-white">
             <Sidebar />
-            <div className=" flex flex-col items-center w-full max-w-7xl px-2 sm:px-4 py-3
+
+            <div className=" flex flex-col items-center w-full px-2 sm:px-4 py-3
                   ml-0 md:ml-50 ">
                 <div className="w-full flex flex-row justify-between items-center mb-6 mt-15 md:mt-0">
                     <h1 className="text-2xl underline underline-offset-2 sm:text-3xl font-extrabold text-slate-800 tracking-tight">Teams & Work Status</h1>
@@ -195,107 +245,51 @@ export default function TeamsPage() {
 
                 {/* Modal */}
                 {showForm && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70">
-                        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-lg border border-gray-200 relative modal-animate-in">
-                            <button
-                                className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-                                onClick={() => setShowForm(false)}
-                                aria-label="Close"
-                                type="button"
-                            >
-                                &times;
-                            </button>
-                            <h2 className="underline underline-offset-2 text-xl font-bold mb-4 text-slate-800">Add New Team</h2>
-                            <form onSubmit={handleAddTeam} className="flex flex-col gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Team Name</label>
-                                    <input ref={teamNameInputRef}
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
-                                        placeholder="Team Name"
-                                        value={teamName}
-                                        onChange={(e) => setTeamName(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Initial Task Title <span className="text-gray-400 font-normal">(optional)</span></label>
-                                    <input
-                                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
-                                        placeholder="Initial Task Title"
-                                        value={initialTaskTitle}
-                                        onChange={(e) => setInitialTaskTitle(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Initial Task Stage</label>
-                                    <Select
-                                        className="w-full"
-                                        options={STAGES}
-                                        value={initialTaskStage}
-                                        onChange={setInitialTaskStage}
-                                        isDisabled={!initialTaskTitle.trim()}
-                                        placeholder="Select Stage"
-                                        styles={{
-                                            control: (base) => ({
-                                                ...base,
-                                                borderColor: "#d1d5db",
-                                                minHeight: "38px",
-                                                boxShadow: "none",
-                                            }),
-                                        }}
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="cursor-pointer mt-2 px-4 py-2 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
-                                >
-                                    Add Team
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    <AddTeamModal
+                        show={showForm}
+                        onClose={() => setShowForm(false)} onSubmit={handleAddTeam}
+                        teamName={teamName} setTeamName={setTeamName}
+                        initialTaskTitle={initialTaskTitle} setInitialTaskTitle={setInitialTaskTitle}
+                        initialTaskStage={initialTaskStage} setInitialTaskStage={setInitialTaskStage} STAGES={STAGES}
+                        teamNameInputRef={teamNameInputRef}
+                    />
+
                 )}
 
                 {/* when no teams are present */}
                 {teams.length === 0 && (
-                    <div className="flex flex-col items-center w-full py-16">
-                        <div className="text-lg text-gray-600 mb-2">No teams found yet.</div>
-                        <div className="text-sm text-gray-400 mb-4 italic">
-                            It's quieter than a library in here... Time to start your first team!
-                        </div>
-                        <button
-                            className="cursor-pointer px-5 py-2 rounded-lg font-semibold transition-colors shadow bg-green-600 text-white hover:bg-green-700"
-                            onClick={() => setShowForm(true)}
-                        >
-                            + Add Your First Team
-                        </button>
-                    </div>
+                    <NoTeamsModal setShowForm={setShowForm} />
                 )}
 
                 {teams.length > 0 && (
                     <>
                         {/* desktop div */}
-                        <div className="hidden md:block w-full rounded-lg overflow-x-auto border border-gray-200 shadow bg-white">
+                        <div className="hidden md:block w-full rounded-lg overflow-x-auto border border-gray-300 shadow bg-white">
                             <table className="min-w-full text-sm border-collapse">
                                 <thead className="bg-slate-100">
                                     <tr>
-                                        <th className="p-4 border-b border-gray-200 border-r text-center">S.No.</th>
-                                        <th className="p-4 border-b border-gray-200 border-r text-left">Team Name</th>
-                                        <th className="p-4 border-b border-gray-200 border-r text-left">Task Title</th>
-                                        <th className="p-4 border-b border-gray-200 border-r text-left">Stage</th>
-                                        <th className="p-4 border-b border-gray-200  text-center">Actions</th>
+                                        <th className="p-4 border-b border-r border-gray-300 text-center">S.No.</th>
+                                        <th className="p-4 border-b border-r border-gray-300 text-left">Team Name</th>
+                                        <th className="p-4 border-b border-r border-gray-300 text-left">Task Title</th>
+                                        <th className="p-4 border-b border-r border-gray-300 text-left">Stage</th>
+                                        <th className="p-4 border-b border-gray-300 text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {teams.map((team, teamIdx) => {
                                         const tasks = team.tasks ?? [];
+
+                                        //agar team k andar koi task exist hi nhi krta 
                                         if (tasks.length === 0) {
                                             return (
-                                                <tr key={team.id || team._id} className="even:bg-gray-50">
-                                                    <td className="p-4 border-b border-gray-100 border-r align-top text-center font-semibold bg-slate-50">
-                                                        {teamIdx + 1}
+                                                <tr
+                                                    key={team.id || team._id}
+                                                    className="even:bg-gray-50 hover:bg-gray-50 border-b border-gray-300"
+                                                >
+                                                    <td className="p-4 border-r border-gray-300 text-center font-semibold bg-slate-50">
+                                                        {(page - 1) * limit + teamIdx + 1}
                                                     </td>
-                                                    <td className="p-4 border-b border-gray-100 border-r align-top bg-slate-50">
+                                                    <td className="p-4 border-r border-gray-300 bg-slate-50">
                                                         <Link
                                                             className="font-semibold underline underline-offset-1 decoration-1 decoration-indigo-700 hover:decoration-green-700 text-indigo-700 hover:text-green-700 transition break-words"
                                                             href={`/teams/${team.id || team._id}`}
@@ -303,16 +297,16 @@ export default function TeamsPage() {
                                                             {team.name}
                                                         </Link>
                                                     </td>
-                                                    <td className="p-4 border-b border-gray-100 border-r break-words italic text-gray-400">
+                                                    <td className="p-4 border-r border-gray-300 italic text-gray-400">
                                                         No task assigned
                                                     </td>
-                                                    <td className="p-4 border-b border-gray-100 border-r italic text-gray-400">
+                                                    <td className="p-4 border-r border-gray-300 italic text-gray-400">
                                                         <span className="inline-block w-3 h-3 rounded-full mr-2 align-middle bg-gray-300" />
                                                         —
                                                     </td>
-                                                    <td className="flex items-center justify-center p-4 border-b border-gray-100 text-center">
+                                                    <td className="flex border-b-0 gap-1 items-center justify-center p-4 text-center align-top">
                                                         <button
-                                                            className="cursor-pointer flex items-center justify-center p-1 rounded-lg text-white bg-red-600 hover:bg-red-700 font-semibold disabled:opacity-50"
+                                                            className="cursor-pointer flex items-center justify-center p-1 rounded-lg text-white bg-red-600 hover:bg-red-700 font-semibold disabled:opacity-50 hover:scale-105 transition"
                                                             onClick={() => handleDeleteTeam(team.id || team._id)}
                                                             disabled={deletingTeamId === team.id || deletingTeamId === team._id}
                                                             title="Delete Team"
@@ -322,10 +316,20 @@ export default function TeamsPage() {
                                                                     <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="4" fill="none" />
                                                                 </svg>
                                                             ) : (
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                                                    <path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17" />
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 24 24">
+                                                                    <path
+                                                                        fill="currentColor"
+                                                                        d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
+                                                                    />
                                                                 </svg>
                                                             )}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleAISummary(team)}
+                                                            title="Generate AI Summary"
+                                                            className="focus:outline-0 cursor-pointer h-8 w-8 hover:scale-105 transition"
+                                                        >
+                                                            <img className="rounded-xl" src="https://img.icons8.com/?size=100&id=hxglyfr7X4fd&format=png&color=000000" alt="" />
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -333,18 +337,20 @@ export default function TeamsPage() {
                                         }
 
                                         return tasks.map((task, idx) => (
-                                            <tr key={task.id || task._id} className="even:bg-gray-50">
+                                            <tr
+                                                key={task.id || task._id}
+                                                className={`even:bg-gray-50 hover:bg-gray-50 ${idx === tasks.length - 1 ? "border-b border-gray-300" : ""}`}
+                                            >
                                                 {idx === 0 && (
                                                     <>
-                                                        <td
-                                                            rowSpan={tasks.length}
-                                                            className="p-4 border-b border-gray-100 border-r align-top text-center font-semibold bg-slate-50"
+                                                        <td rowSpan={tasks.length}
+                                                            className="p-4 border-r border-gray-300 text-center font-semibold bg-slate-50"
                                                         >
                                                             {teamIdx + 1}
                                                         </td>
                                                         <td
                                                             rowSpan={tasks.length}
-                                                            className="p-4 border-b border-gray-100 border-r align-top bg-slate-50"
+                                                            className="p-4 border-r border-gray-300 bg-slate-50"
                                                         >
                                                             <Link
                                                                 className="font-semibold underline underline-offset-1 decoration-1 decoration-indigo-700 hover:decoration-green-700 text-indigo-700 hover:text-green-700 transition break-words"
@@ -355,29 +361,19 @@ export default function TeamsPage() {
                                                         </td>
                                                     </>
                                                 )}
-                                                <td className="p-4 border-b border-gray-100 border-r break-words">{task.title}</td>
-                                                <td
-                                                    className={
-                                                        "p-4 border-b border-gray-100 " +
-                                                        getStatusClasses(task.status)
-                                                    }
-                                                >
+                                                <td className="p-4 border-r border-gray-300">{task.title}</td>
+                                                <td className={`p-4 border-r border-gray-300 ${getStatusClasses(task.status)}`}>
                                                     <span
-                                                        className={
-                                                            "inline-block w-3 h-3 rounded-full mr-2 align-middle " +
-                                                            getDotColor(task.status)
-                                                        }
+                                                        className={`inline-block w-3 h-3 rounded-full mr-2 align-middle ${getDotColor(task.status)}`}
                                                     />
                                                     {task.status}
                                                 </td>
-
                                                 {idx === 0 && (
-                                                    <td
-                                                        rowSpan={tasks.length}
-                                                        className="flex items-center justify-center p-4 border-b border-gray-100 text-center align-top"
+                                                    <td rowSpan={tasks.length}
+                                                        className="flex gap-1 items-center justify-center p-4 text-center align-top"
                                                     >
                                                         <button
-                                                            className="cursor-pointer flex items-center justify-center p-1 rounded-lg text-white bg-red-600 hover:bg-red-700 font-semibold disabled:opacity-50"
+                                                            className="hover:scale-105 transition cursor-pointer flex items-center justify-center p-1 rounded-lg text-white bg-red-600 hover:bg-red-700 font-semibold disabled:opacity-50"
                                                             onClick={() => handleDeleteTeam(team.id || team._id)}
                                                             disabled={deletingTeamId === team.id || deletingTeamId === team._id}
                                                             title="Delete Team"
@@ -388,9 +384,19 @@ export default function TeamsPage() {
                                                                 </svg>
                                                             ) : (
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                                                    <path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17" />
+                                                                    <path
+                                                                        fill="currentColor"
+                                                                        d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zm3-4q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17"
+                                                                    />
                                                                 </svg>
                                                             )}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleAISummary(team)}
+                                                            title="Generate AI Summary"
+                                                            className="rounded-lg h-8 w-8 cursor-pointer hover:scale-105 transition"
+                                                        >
+                                                            <img className="rounded-xl" src="https://img.icons8.com/?size=100&id=hxglyfr7X4fd&format=png&color=000000" alt="" />
                                                         </button>
                                                     </td>
                                                 )}
@@ -400,6 +406,7 @@ export default function TeamsPage() {
                                 </tbody>
                             </table>
                         </div>
+
 
                         {/* mobile div */}
                         <div className="md:hidden w-full flex flex-col gap-4">
@@ -434,39 +441,51 @@ export default function TeamsPage() {
                                         >
                                             View Details
                                         </Link>
-                                        <button
-                                            className="cursor-pointer underline underline-offset-2  text-red-500 hover:text-red-600 font-bold text-sm"
-                                            onClick={() => handleDeleteTeam(team.id || team._id)}
-                                            title="Delete Team"
-                                        >
-                                            Delete
-                                        </button>
+
+                                        <div className="flex items-center gap-4">
+                                            <button
+                                                onClick={() => handleAISummary(team)}
+                                                className="cursor-pointer flex items-center gap-1 text-[#93c5fd] hover:text-[#60a5fa] underline underline-offset-2 text-sm font-bold"
+                                                title="Generate AI Summary"
+                                                disabled={isSummarizing}
+                                            >
+                                                {isSummarizing ? (
+                                                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                    </svg>
+                                                ) : (
+                                                    <span>AI Summarize</span>
+                                                )}
+                                            </button>
+
+
+                                            <button
+                                                className="cursor-pointer underline underline-offset-2 text-red-500 hover:text-red-600 font-bold text-sm"
+                                                onClick={() => handleDeleteTeam(team.id || team._id)}
+                                                title="Delete Team"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </div>
                             ))}
                         </div>
 
-                        <div className="w-full flex justify-end items-center gap-2 mt-6 mb-4 md:mb-0">
-                            <button
-                                className="cursor-pointer px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                            >
-                                ←
-                            </button>
-                            <span className="px-2 text-gray-700">
-                                Page <span className="font-bold">{page}</span> of <span className="font-bold">{totalPages}</span>
-                            </span>
-                            <button
-                                className="cursor-pointer px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages}
-                            >
-                                →
-                            </button>
-                        </div>
+                        <Pagination page={page} setPage={setPage} totalPages={totalPages} />
                     </>
                 )}
+
+                <SummaryModal
+                    open={summaryModalOpen}
+                    isLoading={isSummarizing}
+                    summary={summaryContent}
+                    onClose={() => {
+                        setSummaryModalOpen(false);
+                        setSummaryContent("");
+                    }}
+                />
             </div>
         </div>
     );

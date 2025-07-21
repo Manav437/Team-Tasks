@@ -1,4 +1,3 @@
-// src/app/api/teams/[id]/tasks/route.js
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
