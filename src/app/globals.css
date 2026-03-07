@@ -23,7 +23,7 @@ body {
         sans-serif;
 }
 
-button:launch {
+button:active {
     border: none;
 }
 
@@ -277,15 +277,16 @@ button:focus {
     border-radius: 50px;
     --c: no-repeat radial-gradient(farthest-side, #808080 92%, #0000);
     --s: 18px 18px;
-    -webkit-mask:
+    /*-webkit-mask:
         var(--c) left 4px top 50%,
         var(--c) center,
         var(--c) right 4px top 50%,
-        linear-gradient(#000 0 0);
+        linear-gradient(#000 0 0);*/
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     animation: l1 1.5s infinite;
 }
+
 @keyframes l1 {
     0% {
         -webkit-mask-size:
