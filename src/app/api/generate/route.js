@@ -10,6 +10,9 @@ export async function POST(req) {
         return NextResponse.json({ summary });
     } catch (err) {
         console.error("AI Route Error:", err);
-        return NextResponse.json({ error: "Failed to generate summary" }, { status: 500 });
+        return NextResponse.json(
+            { error: "Failed to generate summary" },
+            { status: 500 },
+        );
     }
 }

@@ -10,10 +10,9 @@ export async function generateSummary(prompt) {
         contents: [
             {
                 role: "user",
-                parts: [{ text: prompt }]
-            }
-        ]
+                parts: [{ text: prompt }],
+            },
+        ],
     });
-
     return result.text;
 }

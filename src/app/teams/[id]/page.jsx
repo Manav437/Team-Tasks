@@ -1,7 +1,6 @@
-// TeamPage.js
 "use client";
 import React, { useEffect, useState } from "react";
-import Select from 'react-select';
+import Select from "react-select";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -21,26 +20,38 @@ function getDotColor(status) {
 }
 
 const filterOptions = [
-    { value: "All", label: <span className="flex items-center"><span className="inline-block w-2 h-4 mr-1 align-middle bg-gray-300 rounded" />All Status</span> },
-    ...STAGES.map(s => ({
+    {
+        value: "All",
+        label: (
+            <span className="flex items-center">
+                <span className="inline-block w-2 h-4 mr-1 align-middle bg-gray-300 rounded" />
+                All Status
+            </span>
+        ),
+    },
+    ...STAGES.map((s) => ({
         value: s,
         label: (
             <span className="flex items-center">
-                <span className={`inline-block w-2 h-4 mr-1 align-middle rounded ${getDotColor(s)}`} />
+                <span
+                    className={`inline-block w-2 h-4 mr-1 align-middle rounded ${getDotColor(s)}`}
+                />
                 {s}
             </span>
-        )
-    }))
+        ),
+    })),
 ];
 
-const options = STAGES.map(s => ({
+const options = STAGES.map((s) => ({
     value: s,
     label: (
         <span className="flex items-center">
-            <span className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(s)}`} />
+            <span
+                className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(s)}`}
+            />
             {s}
         </span>
-    )
+    ),
 }));
 
 export default function TeamPage({ params }) {
@@ -49,7 +60,6 @@ export default function TeamPage({ params }) {
     const [team, setTeam] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [title, setTitle] = useState("");
@@ -63,15 +73,13 @@ export default function TeamPage({ params }) {
     const [editStatus, setEditStatus] = useState(STAGES[0]);
     const [editDescription, setEditDescription] = useState("");
 
-
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
-
 
     const [collapsed, setCollapsed] = useState({
         "Not Started": false,
         "In Progress": false,
-        "Completed": false,
+        Completed: false,
     });
 
     useEffect(() => {
@@ -111,7 +119,7 @@ export default function TeamPage({ params }) {
             setTeam((prev) =>
                 prev
                     ? { ...prev, tasks: [...(prev.tasks ?? []), newTask] }
-                    : prev
+                    : prev,
             );
             setTitle("");
             setStatus(STAGES[0]);
@@ -134,13 +142,23 @@ export default function TeamPage({ params }) {
 
     async function handleEditTask(e) {
         e.preventDefault();
-        if (editIdx === null || !editTitle.trim() || !editDescription.trim() || !team) return;
+        if (
+            editIdx === null ||
+            !editTitle.trim() ||
+            !editDescription.trim() ||
+            !team
+        )
+            return;
         try {
             const taskId = team.tasks[editIdx].id || team.tasks[editIdx]._id;
             const res = await fetch(`/api/teams/${id}/tasks/${taskId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: editTitle, status: editStatus, description: editDescription }),
+                body: JSON.stringify({
+                    title: editTitle,
+                    status: editStatus,
+                    description: editDescription,
+                }),
             });
             if (!res.ok) throw new Error("Failed to update task");
             const updatedTask = await res.json();
@@ -163,7 +181,7 @@ export default function TeamPage({ params }) {
     async function handleDeleteTask() {
         if (editIdx === null || !team) return;
         const confirmed = window.confirm(
-            "Are you sure you want to delete the task?\nThis action cannot be undone."
+            "Are you sure you want to delete the task?\nThis action cannot be undone.",
         );
         if (!confirmed) return;
         try {
@@ -188,11 +206,10 @@ export default function TeamPage({ params }) {
         }
     }
 
-
     const toggleCollapse = (stage) => {
-        setCollapsed(prev => ({
+        setCollapsed((prev) => ({
             ...prev,
-            [stage]: !prev[stage]
+            [stage]: !prev[stage],
         }));
     };
 
@@ -209,41 +226,39 @@ export default function TeamPage({ params }) {
         notFound();
     }
 
-
     let filteredTasks = (team.tasks || []).filter((task) => {
-        const matchesStatus = filterStatus === "All" || task.status === filterStatus;
+        const matchesStatus =
+            filterStatus === "All" || task.status === filterStatus;
         const matchesSearch =
             task.title.toLowerCase().includes(search.toLowerCase()) ||
-            (task.description || "").toLowerCase().includes(search.toLowerCase());
+            (task.description || "")
+                .toLowerCase()
+                .includes(search.toLowerCase());
         return matchesStatus && matchesSearch;
     });
-
 
     const tasksByStatus = {
         "Not Started": [],
         "In Progress": [],
-        "Completed": [],
+        Completed: [],
     };
 
     filteredTasks.forEach((task, idx) => {
         if (tasksByStatus[task.status]) {
-            // Find the original index in team.tasks for editing
             const origIdx = team.tasks.findIndex(
-                t => (t.id || t._id) === (task.id || task._id)
+                (t) => (t.id || t._id) === (task.id || task._id),
             );
             tasksByStatus[task.status].push({ ...task, idx: origIdx });
         }
     });
 
-
-    const getOptionByValue = (val) => options.find(opt => opt.value === val);
+    const getOptionByValue = (val) => options.find((opt) => opt.value === val);
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-300 py-4 px-2">
             <div className="w-full max-w-6xl mx-auto">
                 <div className="w-full max-w-6xl mx-auto mb-4">
                     <div className="flex items-center justify-between">
-
                         <Link
                             href="/teams"
                             className="inline-block px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
@@ -252,7 +267,10 @@ export default function TeamPage({ params }) {
                         </Link>
 
                         <h1 className="flex-1 text-black text-2xl font-bold text-center">
-                            Team : <span className="text-slate-700 underline underline-offset-2">{team.name}</span>
+                            Team :{" "}
+                            <span className="text-slate-700 underline underline-offset-2">
+                                {team.name}
+                            </span>
                         </h1>
 
                         <div className="w-[48px]" />
@@ -265,10 +283,10 @@ export default function TeamPage({ params }) {
                         className="focus:outline-none focus:border-slate-400 border-1 border-slate-300 rounded px-3 py-1.5 w-1/2 sm:w-1/3"
                         placeholder="Search tasks / description"
                         value={search}
-                        onChange={e => {
+                        onChange={(e) => {
                             const value = e.target.value;
                             setSearch(value);
-                            if (value.trim() !== '') {
+                            if (value.trim() !== "") {
                                 setCollapsed(true);
                             }
                         }}
@@ -276,8 +294,10 @@ export default function TeamPage({ params }) {
 
                     <Select
                         options={filterOptions}
-                        value={filterOptions.find(opt => opt.value === filterStatus)}
-                        onChange={opt => setFilterStatus(opt.value)}
+                        value={filterOptions.find(
+                            (opt) => opt.value === filterStatus,
+                        )}
+                        onChange={(opt) => setFilterStatus(opt.value)}
                         isSearchable
                         className="rounded caret-transparent w-1/2 sm:w-1/3"
                         classNamePrefix="react-select"
@@ -287,10 +307,17 @@ export default function TeamPage({ params }) {
 
             <div className="w-full max-w-6xl flex flex-col md:flex-row items-start gap-4 justify-center">
                 {STAGES.map((stage) => (
-                    <div key={stage} className="flex-1 flex flex-col gap-2 w-full md:min-w-[250px]">
-                        <div className="flex items-center justify-between rounded-t-sm py-1 bg-slate-200">
-                            <span className={`flex items-center w-fit justify-between pl-2 py-1 rounded text-xs ${getStatusClasses(stage)}`}>
-                                <span className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(stage)}`} />
+                    <div
+                        key={stage}
+                        className="flex-1 flex flex-col gap-2 w-full md:min-w-[250px]"
+                    >
+                        <div className="flex items-center justify-between rounded-t-sm py-1 bg-slate-300 border-1 border-gray-400">
+                            <span
+                                className={`flex items-center w-fit justify-between pl-2 py-1 rounded text-xs ${getStatusClasses(stage)}`}
+                            >
+                                <span
+                                    className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(stage)}`}
+                                />
                                 {stage}
                                 <span className="ml-2 text-xs text-gray-500 font-semibold">
                                     ({tasksByStatus[stage].length})
@@ -299,9 +326,11 @@ export default function TeamPage({ params }) {
                             <div className="flex items-center gap-2">
                                 <button
                                     type="button"
-                                    aria-label={collapsed[stage] ? "Expand" : "Collapse"}
+                                    aria-label={
+                                        collapsed[stage] ? "Expand" : "Collapse"
+                                    }
                                     onClick={() => toggleCollapse(stage)}
-                                    className="cursor-pointer p-1 rounded hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className="cursor-pointer p-1 rounded hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 >
                                     <svg
                                         className={`transition-transform duration-200 ${collapsed[stage] ? "rotate-180" : "rotate-0"}`}
@@ -311,7 +340,13 @@ export default function TeamPage({ params }) {
                                         fill="none"
                                         xmlns="http://www.w3.org/2000/svg"
                                     >
-                                        <path d="M6 8L10 12L14 8" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path
+                                            d="M6 8L10 12L14 8"
+                                            stroke="#555"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
                                     </svg>
                                 </button>
 
@@ -322,7 +357,7 @@ export default function TeamPage({ params }) {
                                         setStatus(stage);
                                         setShowAddForm(true);
                                     }}
-                                    className="p-1 mr-1 cursor-pointer rounded hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className="p-1 mr-1 cursor-pointer rounded hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 >
                                     <svg
                                         width="20"
@@ -343,7 +378,7 @@ export default function TeamPage({ params }) {
                             </div>
                         </div>
                         <div
-                            className={`rounded-b-sm bg-slate-200 overflow-hidden transition-all duration-300 ${collapsed[stage] ? "max-h-0 p-0" : "min-h-36.5 pt-2"}`}
+                            className={`rounded-b-sm bg-slate-200 border-1 border-gray-400 overflow-hidden transition-all duration-300 ${collapsed[stage] ? "max-h-0 p-0" : "min-h-36.5 pt-2"}`}
                             style={{
                                 maxHeight: collapsed[stage] ? 0 : 1000, // Large enough for most lists
                                 paddingTop: collapsed[stage] ? 0 : undefined,
@@ -353,21 +388,31 @@ export default function TeamPage({ params }) {
                             {!collapsed[stage] && (
                                 <>
                                     {tasksByStatus[stage].length === 0 && (
-                                        <div className="text-gray-400 text-center rounded-md p-1 bg-gray-100 mx-auto w-19/20 text-sm px-2 h-full">No tasks</div>
+                                        <div className="text-gray-400 text-center rounded-md p-1 bg-gray-100 mx-auto w-19/20 text-sm px-2 h-full">
+                                            No tasks
+                                        </div>
                                     )}
                                     <ul>
                                         {tasksByStatus[stage].map((task, i) => (
                                             <li
                                                 key={task.id || task._id || i}
                                                 className="flex mx-auto w-19/20 flex-col px-2 py-2 bg-slate-100 rounded shadow mb-2 cursor-pointer transition hover:bg-blue-50"
-                                                onClick={() => openEditModal(task.idx)}
+                                                onClick={() =>
+                                                    openEditModal(task.idx)
+                                                }
                                             >
                                                 <div className="flex items-center justify-between border-b border-slate-300">
-                                                    <span className="font-medium">{task.title}</span>
-                                                    <span className="hover:underline text-xs text-gray-400 hover:text-gray-600">Edit</span>
+                                                    <span className="font-medium">
+                                                        {task.title}
+                                                    </span>
+                                                    <span className="hover:underline text-xs text-gray-400 hover:text-gray-600">
+                                                        Edit
+                                                    </span>
                                                 </div>
                                                 {task.description && (
-                                                    <div className="text-xs ml-1 text-gray-500 mt-1">{task.description}</div>
+                                                    <div className="text-xs ml-1 text-gray-500 mt-1">
+                                                        {task.description}
+                                                    </div>
                                                 )}
                                             </li>
                                         ))}
@@ -383,10 +428,12 @@ export default function TeamPage({ params }) {
             {showAddForm && (
                 <div className="fixed inset-0 bg-gray-400/40 bg-opacity-30 flex items-center justify-center z-50">
                     <form
-                        className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-4 w-[90vw] max-w-md"
+                        className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-4 w-[95vw] max-w-md"
                         onSubmit={handleAddTask}
                     >
-                        <h2 className="text-lg font-bold">Add Task</h2>
+                        <h2 className="text-xl text-center font-bold">
+                            Add Task
+                        </h2>
                         <input
                             type="text"
                             className="focus:outline-0 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
@@ -395,10 +442,11 @@ export default function TeamPage({ params }) {
                             onChange={(e) => setTitle(e.target.value)}
                             required
                         />
-                        <Select className="caret-transparent"
+                        <Select
+                            className="caret-transparent"
                             options={options}
                             value={getOptionByValue(status)}
-                            onChange={opt => setStatus(opt.value)}
+                            onChange={(opt) => setStatus(opt.value)}
                             classNamePrefix="react-select"
                         />
                         <textarea
@@ -431,10 +479,12 @@ export default function TeamPage({ params }) {
             {showEditForm && (
                 <div className="fixed inset-0 bg-gray-400/40 bg-opacity-30 flex items-center justify-center z-50">
                     <form
-                        className="bg-white p-6 rounded shadow-md flex flex-col gap-4 w-[90vw] max-w-md"
+                        className="bg-white p-6 rounded shadow-md flex flex-col gap-4 w-[95vw] max-w-md"
                         onSubmit={handleEditTask}
                     >
-                        <h2 className="text-lg font-bold">Edit Task</h2>
+                        <h2 className="text-xl text-center font-bold">
+                            Edit Task
+                        </h2>
                         <input
                             type="text"
                             className="focus:outline-none border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
@@ -443,10 +493,11 @@ export default function TeamPage({ params }) {
                             onChange={(e) => setEditTitle(e.target.value)}
                             required
                         />
-                        <Select className="focus:outline-none caret-transparent"
+                        <Select
+                            className="focus:outline-none caret-transparent"
                             options={options}
                             value={getOptionByValue(editStatus)}
-                            onChange={opt => setEditStatus(opt.value)}
+                            onChange={(opt) => setEditStatus(opt.value)}
                             classNamePrefix="react-select"
                         />
                         <textarea

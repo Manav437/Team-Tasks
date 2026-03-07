@@ -1,8 +1,19 @@
-// SummaryModal.jsx
 "use client";
+import { useEffect } from "react";
 import { marked } from "marked";
 
 export default function SummaryModal({ open, isLoading, summary, onClose }) {
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [open]);
     if (!open) return null;
 
     return (
@@ -30,7 +41,10 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
                         aria-hidden="true"
                         focusable="false"
                     >
-                        <path fill="orange" d="M34 6c-1.368 4.944-3.13 6.633-8 8c4.87 1.367 6.632 3.056 8 8c1.368-4.944 3.13-6.633 8-8c-4.87-1.367-6.632-3.056-8-8m-14 8c-2.395 8.651-5.476 11.608-14 14c8.524 2.392 11.605 5.349 14 14c2.395-8.651 5.476-11.608 14-14c-8.524-2.392-11.605-5.349-14-14" />
+                        <path
+                            fill="orange"
+                            d="M34 6c-1.368 4.944-3.13 6.633-8 8c4.87 1.367 6.632 3.056 8 8c1.368-4.944 3.13-6.633 8-8c-4.87-1.367-6.632-3.056-8-8m-14 8c-2.395 8.651-5.476 11.608-14 14c8.524 2.392 11.605 5.349 14 14c2.395-8.651 5.476-11.608 14-14c-8.524-2.392-11.605-5.349-14-14"
+                        />
                     </svg>
                 </h1>
 
@@ -63,9 +77,14 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
                             aria-hidden="true"
                             className="inline-block align-middle"
                         >
-                            <path fill="orange" d="M34 6c-1.368 4.944-3.13 6.633-8 8c4.87 1.367 6.632 3.056 8 8c1.368-4.944 3.13-6.633 8-8c-4.87-1.367-6.632-3.056-8-8m-14 8c-2.395 8.651-5.476 11.608-14 14c8.524 2.392 11.605 5.349 14 14c2.395-8.651 5.476-11.608 14-14c-8.524-2.392-11.605-5.349-14-14" />
+                            <path
+                                fill="orange"
+                                d="M34 6c-1.368 4.944-3.13 6.633-8 8c4.87 1.367 6.632 3.056 8 8c1.368-4.944 3.13-6.633 8-8c-4.87-1.367-6.632-3.056-8-8m-14 8c-2.395 8.651-5.476 11.608-14 14c8.524 2.392 11.605 5.349 14 14c2.395-8.651 5.476-11.608 14-14c-8.524-2.392-11.605-5.349-14-14"
+                            />
                         </svg>
-                        <span className="ml-0 font-semibold text-black">Gemini</span>
+                        <span className="ml-0 font-semibold text-black">
+                            Gemini
+                        </span>
                     </span>
                 </a>
             </div>

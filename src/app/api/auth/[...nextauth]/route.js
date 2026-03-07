@@ -1,5 +1,3 @@
-// app/api/auth/[...nextauth]/route.js
-
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -31,10 +29,12 @@ export const authOptions = {
                     where: { email: credentials.email },
                 });
                 if (!user || !user.password) {
-                    // Throw an error to show a message on the client
                     throw new Error("No user found. Please sign up first.");
                 }
-                const isValid = await bcrypt.compare(credentials.password, user.password);
+                const isValid = await bcrypt.compare(
+                    credentials.password,
+                    user.password,
+                );
                 if (!isValid) {
                     throw new Error("Invalid credentials");
                 }
@@ -51,7 +51,11 @@ export const authOptions = {
     },
     callbacks: {
         async signIn({ user, account, profile }) {
-            if (account.provider === "google" && profile && !profile.email_verified) {
+            if (
+                account.provider === "google" &&
+                profile &&
+                !profile.email_verified
+            ) {
                 return false;
             }
             return true;

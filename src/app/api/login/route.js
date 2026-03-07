@@ -21,15 +21,17 @@ export const authOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                // Find user by email
                 const user = await prisma.user.findUnique({
                     where: { email: credentials.email },
                 });
                 if (!user || !user.password) return null;
-                // Compare password
-                const isValid = await bcrypt.compare(credentials.password, user.password);
+
+                const isValid = await bcrypt.compare(
+                    credentials.password,
+                    user.password,
+                );
                 if (!isValid) return null;
-                // Return user object (id, name, email)
+
                 return {
                     id: user.id,
                     name: user.name,
