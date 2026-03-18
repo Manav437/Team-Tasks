@@ -23,6 +23,27 @@ body {
         sans-serif;
 }
 
+@keyframes float {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.3; /* Base visibility */
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+        opacity: 0.5; /* Brightest when largest */
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+        opacity: 0.2; /* Faintest when smallest */
+    }
+}
+
+.animate-blob {
+    animation: float 10s infinite alternate ease-in-out;
+    will-change: transform;
+}
+
 button:active {
     border: none;
 }

@@ -369,11 +369,9 @@ export default function TeamsPage() {
                                                     <td className="p-4 border-r border-gray-300">
                                                         {task.title}
                                                     </td>
-                                                    <td
-                                                        className={`p-4 border-r border-gray-300 ${STATUS_STYLES[x]?.dot ?? ""}`}
-                                                    >
+                                                    <td className="p-4 border-r border-gray-300">
                                                         <span
-                                                            className={`inline-block w-3 h-3 rounded-full mr-2 align-middle ${STATUS_STYLES[x]?.dot ?? ""}`}
+                                                            className={`inline-block w-3 h-3 rounded-full mr-2 align-middle ${STATUS_STYLES[task.status]?.dot ?? ""}`}
                                                         />
                                                         {task.status}
                                                     </td>
@@ -479,10 +477,10 @@ export default function TeamsPage() {
                                                             {task.title}
                                                         </div>
                                                         <span
-                                                            className={`flex items-center ml-2 px-2 py-1 rounded text-xs ${STATUS_STYLES[x]?.dot ?? ""}`}
+                                                            className={`flex items-center ml-2 px-2 py-1 rounded text-xs ${STATUS_STYLES[task.status]?.text ?? ""}`}
                                                         >
                                                             <span
-                                                                className={`inline-block w-2 h-2 rounded-full mr-1 align-middle ${STATUS_STYLES[x]?.dot ?? ""}`}
+                                                                className={`inline-block w-2 h-2 rounded-full mr-1 align-middle ${STATUS_STYLES[task.status]?.dot ?? ""}`}
                                                             />
                                                             {task.status}
                                                         </span>

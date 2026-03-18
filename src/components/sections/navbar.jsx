@@ -2,17 +2,26 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-const NAV_LINKS = [
-    { label: "Pricing", href: "#" },
-    { label: "Blogs", href: "#" },
-    { label: "Log In", href: "/auth/login" },
-    { label: "Sign Up", href: "/auth/signup" },
-];
+import { useSession } from "next-auth/react";
 
 export const Navbar = () => {
+    const { data: session } = useSession();
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+
+    const baseLinks = [
+        { label: "Pricing", href: "#" },
+        { label: "Blogs", href: "#" },
+    ];
+
+    const authLinks = session
+        ? [{ label: "Dashboard", href: "/teams", isButton: true }]
+        : [
+              { label: "Log In", href: "/auth/login" },
+              { label: "Sign Up", href: "/auth/signup", isButton: true },
+          ];
+
+    const allLinks = [...baseLinks, ...authLinks];
 
     useEffect(() => {
         if (menuOpen) document.body.style.overflow = "hidden";
@@ -32,15 +41,14 @@ export const Navbar = () => {
         <>
             <header
                 className={`
-                            sticky top-0 md:top-4 z-50 transition-all duration-500 ease-in-out px-6 py-4 mx-auto flex items-center justify-between
-                            ${
-                                scrolled
-                                    ? "w-full max-w-4xl rounded-none md:rounded-full bg-white/70 backdrop-blur-sm border border-slate-200/50 shadow-lg py-2"
-                                    : "w-full max-w-6xl rounded-none bg-transparent border-transparent py-4"
-                            }
-                        `}
+                    sticky top-0 md:top-4 z-50 transition-all duration-500 ease-in-out px-6 py-4 mx-auto flex items-center justify-between
+                    ${
+                        scrolled
+                            ? "w-full max-w-4xl rounded-none md:rounded-full bg-white/70 backdrop-blur-sm border border-slate-200/50 shadow-lg py-2"
+                            : "w-full max-w-6xl rounded-none bg-transparent border-transparent py-4"
+                    }
+                `}
             >
-                {" "}
                 <Link
                     href="/"
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -56,8 +64,10 @@ export const Navbar = () => {
                         TaskPilot
                     </span>
                 </Link>
+
+                {/* Desktop nav */}
                 <nav className="hidden sm:flex items-center gap-6">
-                    {NAV_LINKS.map((link) => (
+                    {allLinks.map((link) => (
                         <Link
                             key={link.label}
                             href={link.href}
@@ -79,30 +89,39 @@ export const Navbar = () => {
                         </Link>
                     ))}
                 </nav>
-                <button
-                    className="sm:hidden relative z-[60] flex flex-col justify-center items-center w-10 h-10 rounded-full hover:bg-black/5 transition-colors"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    aria-label="Toggle Menu"
-                >
-                    <span
-                        className={`block h-0.5 w-5 bg-slate-900 transition-transform duration-300 ${menuOpen ? "rotate-45 translate-y-1" : ""}`}
-                    />
-                    <span
-                        className={`block h-0.5 w-5 bg-slate-900 my-1 transition-opacity ${menuOpen ? "opacity-0" : ""}`}
-                    />
-                    <span
-                        className={`block h-0.5 w-5 bg-slate-900 transition-transform duration-300 ${menuOpen ? "-rotate-45 -translate-y-1" : ""}`}
-                    />
-                </button>
+
+                {/* Hamburger — only shown when menu is CLOSED to avoid stacking context issues */}
+                {!menuOpen && (
+                    <button
+                        className="sm:hidden flex flex-col justify-center items-center w-10 h-10 rounded-full hover:bg-black/5 transition-colors"
+                        onClick={() => setMenuOpen(true)}
+                        aria-label="Open Menu"
+                    >
+                        <span className="block h-0.5 w-5 bg-slate-900" />
+                        <span className="block h-0.5 w-5 bg-slate-900 my-1" />
+                        <span className="block h-0.5 w-5 bg-slate-900" />
+                    </button>
+                )}
             </header>
 
+            {/* Mobile menu overlay */}
             <div
-                className={`fixed inset-0 z-[55] bg-white transition-transform duration-500 ease-in-out sm:hidden ${
+                className={`fixed inset-0 z-[200] bg-white transition-transform duration-500 ease-in-out sm:hidden ${
                     menuOpen ? "translate-y-0" : "-translate-y-full"
                 }`}
             >
+                {/* Close button lives INSIDE the overlay so it's always above it */}
+                <button
+                    className="absolute top-4 right-6 flex flex-col justify-center items-center w-10 h-10 rounded-full hover:bg-black/5 transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                    aria-label="Close Menu"
+                >
+                    <span className="block h-0.5 w-5 bg-slate-900 rotate-45 translate-y-[1px]" />
+                    <span className="block h-0.5 w-5 bg-slate-900 -rotate-45 -translate-y-[1px]" />
+                </button>
+
                 <nav className="flex flex-col items-center justify-center h-full gap-8">
-                    {NAV_LINKS.map((link, i) => (
+                    {allLinks.map((link, i) => (
                         <Link
                             key={link.label}
                             href={link.href}

@@ -29,11 +29,11 @@ export default function RootLayout({ children }) {
             >
                 <div className="fixed inset-0 -z-10 h-full w-full bg-slate-50 overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="absolute top-[15%] left-[15%] h-[600px] w-[600px] rounded-full bg-blue-400/15 blur-[120px]" />
+                        <div className="absolute top-[15%] left-[15%] h-[500px] w-[500px] rounded-full bg-blue-500/30 blur-[90px] animate-blob" />
 
-                        <div className="absolute bottom-[10%] right-[10%] h-[500px] w-[500px] rounded-full bg-green-300/15 blur-[100px]" />
+                        <div className="absolute bottom-[10%] right-[10%] h-[400px] w-[400px] rounded-full bg-emerald-400/30 blur-[80px] animate-blob [animation-delay:2s]" />
 
-                        <div className="absolute top-[40%] left-[40%] h-[400px] w-[400px] rounded-full bg-slate-200/40 blur-[90px]" />
+                        <div className="absolute top-[40%] left-[40%] h-[400px] w-[400px] rounded-full bg-slate-400/20 blur-[90px] animate-blob [animation-delay:4s]" />
                     </div>
 
                     <div
