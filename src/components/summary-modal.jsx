@@ -1,92 +1,119 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { marked } from "marked";
+import { RiGeminiFill, RiCloseLine, RiFileCopyLine, RiCheckLine } from "react-icons/ri";
 
 export default function SummaryModal({ open, isLoading, summary, onClose }) {
+    const [copied, setCopied] = useState(false);
+
+    const [displayedSummary, setDisplayedSummary] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
+
     useEffect(() => {
         if (open) {
             document.body.style.overflow = "hidden";
+            setCopied(false);
+            if (!isLoading && summary) {
+                startTypewriter(summary);
+            }
         } else {
             document.body.style.overflow = "";
+            setDisplayedSummary("");
         }
 
         return () => {
             document.body.style.overflow = "";
         };
-    }, [open]);
+    }, [open, isLoading, summary]);
+
+    const startTypewriter = (text) => {
+        setIsTyping(true);
+        setDisplayedSummary("");
+        let i = 0;
+        const speed = 2;
+
+        const timer = setInterval(() => {
+            setDisplayedSummary(text.slice(0, i));
+            i += 5;
+            if (i > text.length) {
+                setDisplayedSummary(text);
+                setIsTyping(false);
+                clearInterval(timer);
+            }
+        }, 10);
+    };
+
+    const handleCopy = () => {
+        try {
+            navigator.clipboard.writeText(summary);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error("Failed to copy:", err);
+        }
+    };
+
     if (!open) return null;
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
             role="dialog"
             aria-modal="true"
         >
-            <div className="bg-white w-full max-w-lg mx-4 rounded-lg shadow-2xl p-6 relative overflow-y-auto max-h-[80vh]">
-                <button
-                    onClick={onClose}
-                    className="cursor-pointer absolute top-2 right-3 text-gray-400 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-2xl font-bold transition"
-                    aria-label="Close"
-                    tabIndex={0}
-                >
-                    &times;
-                </button>
-                <h1 className="flex items-center mb-4 mx-auto w-fit text-2xl font-extrabold text-slate-800 gap-2">
-                    <span className="decoration-slate-600">AI Summary</span>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="28"
-                        height="28"
-                        viewBox="0 0 48 48"
-                        aria-hidden="true"
-                        focusable="false"
-                    >
-                        <path
-                            fill="orange"
-                            d="M34 6c-1.368 4.944-3.13 6.633-8 8c4.87 1.367 6.632 3.056 8 8c1.368-4.944 3.13-6.633 8-8c-4.87-1.367-6.632-3.056-8-8m-14 8c-2.395 8.651-5.476 11.608-14 14c8.524 2.392 11.605 5.349 14 14c2.395-8.651 5.476-11.608 14-14c-8.524-2.392-11.605-5.349-14-14"
-                        />
-                    </svg>
-                </h1>
-
-                {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-10">
-                        <div className="loader3" aria-label="Loading" />
-                        <p className="text-gray-600 mt-2">Thinking...</p>
+            <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] modal-animate-in">
+                <div className="mx-auto px-6 py-4">
+                    <div className="flex items-center gap-2.5">
+                        {/* <div className="bg-indigo-600 p-1.5 rounded-lg shadow-indigo-200 shadow-lg">
+                            <RiGeminiFill className="text-white text-xl" />
+                        </div> */}
+                        <h2 className="text-xl font-bold text-slate-800 tracking-tight">AI Summary</h2>
                     </div>
-                ) : (
-                    <div
-                        className="prose border-2 border-blue-100 bg-linear-to-b from-[#ddf2f4] to-white rounded-lg p-4 max-w-none"
-                        dangerouslySetInnerHTML={{ __html: marked(summary) }}
-                    />
-                )}
+                </div>
 
-                <a
-                    href="https://gemini.google.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 flex items-center justify-end gap-1 text-xs text-gray-500 hover:underline transition"
-                    aria-label="Powered by Gemini (opens in new tab)"
-                >
-                    <span className="flex items-center gap-1">
-                        Response generated using
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 48 48"
-                            aria-hidden="true"
-                            className="inline-block align-middle"
-                        >
-                            <path
-                                fill="orange"
-                                d="M34 6c-1.368 4.944-3.13 6.633-8 8c4.87 1.367 6.632 3.056 8 8c1.368-4.944 3.13-6.633 8-8c-4.87-1.367-6.632-3.056-8-8m-14 8c-2.395 8.651-5.476 11.608-14 14c8.524 2.392 11.605 5.349 14 14c2.395-8.651 5.476-11.608 14-14c-8.524-2.392-11.605-5.349-14-14"
-                            />
-                        </svg>
-                        <span className="ml-0 font-semibold text-black">
-                            Gemini
-                        </span>
-                    </span>
-                </a>
+                <div className="border-t border-slate-200 flex-1 overflow-y-auto p-6">
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+                            <div className="ai-loader mb-6" />
+                            <p className="text-indigo-600 font-medium tracking-wide">
+                                Analyzing team performance...
+                            </p>
+                            <p className="text-slate-400 text-sm mt-1">Gemini is thinking</p>
+                        </div>
+                    ) : (
+                        <div className="relative group">
+                            {displayedSummary && (
+                                <div
+                                    className="prose prose-slate max-w-none text-slate-700 bg-indigo-50/30 rounded-xl p-5 border border-indigo-100/50 leading-relaxed animate-fade-in"
+                                    dangerouslySetInnerHTML={{ __html: marked(displayedSummary) }}
+                                />
+                            )}
+
+                            {!isLoading && summary && !isTyping && (
+                                <button
+                                    onClick={handleCopy}
+                                    className="cursor-pointer absolute top-2 right-2 p-2 rounded-lg bg-white shadow-sm border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all active:scale-90"
+                                    title="Copy to clipboard"
+                                >
+                                    {copied ? <RiCheckLine className="text-green-500" /> : <RiFileCopyLine />}
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                        <RiGeminiFill className="text-indigo-500 text-sm" />
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Powered by Gemini AI</span>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="cursor-pointer hover:underline underline-offset-2 text-sm font-semibold text-indigo-600 hover:bg-black/5 px-2 py-1 rounded-lg hover:text-indigo-700 transition-colors"
+                    >
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -10,7 +10,7 @@ export const Hero = () => {
                 </h1>
 
                 <p className="max-w-2xl text-slate-500 text-lg md:text-xl text-center font-normal leading-relaxed">
-                    TaskPilot gives managers a clear overview of every team,
+                    <span className="text-slate-800 font-semibold italic"> {" "}Team Tasks</span> gives managers a clear overview of every team,
                     every member, and every task. Assign work, monitor progress,
                     and keep your teams aligned — all in one powerful dashboard.
                 </p>

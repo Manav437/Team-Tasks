@@ -3,19 +3,37 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { IoIosAdd } from "react-icons/io";
+import { MdSearch, MdEdit, MdDelete, MdArrowForward } from "react-icons/md";
+import { HiChevronLeft, HiChevronDown, HiChevronUp, HiDotsVertical } from "react-icons/hi";
+import { RiTaskLine, RiCloseLine, RiGeminiFill } from "react-icons/ri";
+import { Sidebar } from "../../../components/Sidebar";
+import { SkeletonBoard } from "../../../components/loading-state";
 
 const STAGES = ["Not Started", "In Progress", "Completed"];
 
 function getStatusClasses(status) {
-    if (status === "Not Started") return "text-gray-700";
-    if (status === "In Progress") return "text-yellow-800";
-    if (status === "Completed") return "text-green-800";
+    if (status === "Not Started") return "text-slate-600";
+    if (status === "In Progress") return "text-blue-600";
+    if (status === "Completed") return "text-emerald-600";
     return "";
 }
 function getDotColor(status) {
-    if (status === "Not Started") return "bg-gray-400";
-    if (status === "In Progress") return "bg-yellow-400";
-    if (status === "Completed") return "bg-green-500";
+    if (status === "Not Started") return "bg-slate-400";
+    if (status === "In Progress") return "bg-blue-500";
+    if (status === "Completed") return "bg-emerald-500";
+    return "";
+}
+function getColumnBg(status) {
+    if (status === "Not Started") return "bg-slate-50/50";
+    if (status === "In Progress") return "bg-blue-50/50";
+    if (status === "Completed") return "bg-emerald-50/50";
+    return "";
+}
+function getColumnHeaderBg(status) {
+    if (status === "Not Started") return "bg-slate-100";
+    if (status === "In Progress") return "bg-blue-100/80";
+    if (status === "Completed") return "bg-emerald-100/80";
     return "";
 }
 
@@ -107,7 +125,7 @@ export default function TeamPage({ params }) {
 
     async function handleAddTask(e) {
         e.preventDefault();
-        if (!title.trim() || !description.trim()) return;
+        if (!title.trim()) return;
         try {
             const res = await fetch(`/api/teams/${id}/tasks`, {
                 method: "POST",
@@ -145,7 +163,6 @@ export default function TeamPage({ params }) {
         if (
             editIdx === null ||
             !editTitle.trim() ||
-            !editDescription.trim() ||
             !team
         )
             return;
@@ -213,20 +230,14 @@ export default function TeamPage({ params }) {
         }));
     };
 
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center min-h-screen bg-gray-50 justify-center">
-                <div className="loader1 mb-4"></div>
-                <div className="text-lg text-gray-600">Loading tasks...</div>
-            </div>
-        );
-    }
+    // Full-page loader removed to allow shell visibility
 
-    if (error || !team) {
+    // Only redirect to 404 if loading is complete and no team was found
+    if (!loading && (error || !team)) {
         notFound();
     }
 
-    let filteredTasks = (team.tasks || []).filter((task) => {
+    let filteredTasks = team ? (team.tasks || []).filter((task) => {
         const matchesStatus =
             filterStatus === "All" || task.status === filterStatus;
         const matchesSearch =
@@ -235,7 +246,7 @@ export default function TeamPage({ params }) {
                 .toLowerCase()
                 .includes(search.toLowerCase());
         return matchesStatus && matchesSearch;
-    });
+    }) : [];
 
     const tasksByStatus = {
         "Not Started": [],
@@ -243,297 +254,254 @@ export default function TeamPage({ params }) {
         Completed: [],
     };
 
-    filteredTasks.forEach((task, idx) => {
-        if (tasksByStatus[task.status]) {
-            const origIdx = team.tasks.findIndex(
-                (t) => (t.id || t._id) === (task.id || task._id),
-            );
-            tasksByStatus[task.status].push({ ...task, idx: origIdx });
-        }
-    });
+    if (team) {
+        filteredTasks.forEach((task) => {
+            if (tasksByStatus[task.status]) {
+                const origIdx = team.tasks.findIndex(
+                    (t) => (t.id || t._id) === (task.id || task._id),
+                );
+                tasksByStatus[task.status].push({ ...task, idx: origIdx });
+            }
+        });
+    }
 
     const getOptionByValue = (val) => options.find((opt) => opt.value === val);
 
     return (
-        <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-300 py-4 px-2">
-            <div className="w-full max-w-6xl mx-auto">
-                <div className="w-full max-w-6xl mx-auto mb-4">
-                    <div className="flex items-center justify-between">
-                        <Link
-                            href="/teams"
-                            className="inline-block px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow"
-                        >
-                            ←
-                        </Link>
+        <div className="flex min-h-screen bg-[#f8fafc] overflow-hidden">
+            <Sidebar />
 
-                        <h1 className="flex-1 text-black text-2xl font-bold text-center">
-                            Team :{" "}
-                            <span className="text-slate-700 underline underline-offset-2">
-                                {team.name}
-                            </span>
-                        </h1>
-
-                        <div className="w-[48px]" />
-                    </div>
-                </div>
-
-                <div className="flex flex-row sm:flex-row gap-2 sm:gap-4 justify-between items-center mb-4">
-                    <input
-                        type="text"
-                        className="focus:outline-none focus:border-slate-400 border-1 border-slate-300 rounded px-3 py-1.5 w-1/2 sm:w-1/3"
-                        placeholder="Search tasks / description"
-                        value={search}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            setSearch(value);
-                            if (value.trim() !== "") {
-                                setCollapsed(true);
-                            }
-                        }}
-                    />
-
-                    <Select
-                        options={filterOptions}
-                        value={filterOptions.find(
-                            (opt) => opt.value === filterStatus,
-                        )}
-                        onChange={(opt) => setFilterStatus(opt.value)}
-                        isSearchable
-                        className="rounded caret-transparent w-1/2 sm:w-1/3"
-                        classNamePrefix="react-select"
-                    />
-                </div>
-            </div>
-
-            <div className="w-full max-w-6xl flex flex-col md:flex-row items-start gap-4 justify-center">
-                {STAGES.map((stage) => (
-                    <div
-                        key={stage}
-                        className="flex-1 flex flex-col gap-2 w-full md:min-w-[250px]"
-                    >
-                        <div className="flex items-center justify-between rounded-t-sm py-1 bg-slate-300 border-1 border-gray-400">
-                            <span
-                                className={`flex items-center w-fit justify-between pl-2 py-1 rounded text-xs ${getStatusClasses(stage)}`}
-                            >
-                                <span
-                                    className={`inline-block rounded w-2 h-4 mr-1 align-middle ${getDotColor(stage)}`}
-                                />
-                                {stage}
-                                <span className="ml-2 text-xs text-gray-500 font-semibold">
-                                    ({tasksByStatus[stage].length})
-                                </span>
-                            </span>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    aria-label={
-                                        collapsed[stage] ? "Expand" : "Collapse"
-                                    }
-                                    onClick={() => toggleCollapse(stage)}
-                                    className="cursor-pointer p-1 rounded hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+            <main className="flex-1 h-screen flex flex-col overflow-hidden">
+                {/* Fixed Header Section */}
+                <div className="pt-24 md:pt-10 px-4 sm:px-8 shrink-0">
+                    <div className="w-full max-w-full mx-auto">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                            <div className="flex items-center gap-4">
+                                <Link
+                                    href="/teams"
+                                    className="group flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50/50 transition-all shadow-sm active:scale-90"
+                                    title="Back to Teams"
                                 >
-                                    <svg
-                                        className={`transition-transform duration-200 ${collapsed[stage] ? "rotate-180" : "rotate-0"}`}
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 20 20"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M6 8L10 12L14 8"
-                                            stroke="#555"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </button>
+                                    <HiChevronLeft className="text-2xl" />
+                                </Link>
+                                <div>
+                                    <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">
+                                        Board: {team?.name}
+                                    </h1>
+                                    <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
+                                        <Link href="/teams" className="hover:text-slate-600 transition-colors underline-offset-4 hover:underline">Teams</Link>
+                                        <span>/</span>
+                                        <span className="text-blue-600 font-semibold">{team?.name}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-4">
+                                <div className="relative group min-w-[300px]">
+                                    <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                                        <MdSearch size={20} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="pl-11 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none w-full transition-all shadow-sm"
+                                        placeholder="Search tasks..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                    {search && (
+                                        <button
+                                            onClick={() => setSearch("")}
+                                            className="absolute inset-y-0 right-3.5 flex items-center text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
+                                        >
+                                            <RiCloseLine size={20} />
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="min-w-[180px]">
+                                    <Select
+                                        instanceId="status-filter"
+                                        options={filterOptions}
+                                        value={filterOptions.find(opt => opt.value === filterStatus)}
+                                        onChange={opt => setFilterStatus(opt.value)}
+                                        className="text-sm"
+                                        classNamePrefix="react-select"
+                                        menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                        styles={{
+                                            control: (base) => ({
+                                                ...base,
+                                                borderRadius: '0.75rem',
+                                                borderColor: '#e2e8f0',
+                                                '&:hover': { borderColor: '#2563eb' },
+                                                boxShadow: 'none',
+                                            }),
+                                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                        }}
+                                    />
+                                </div>
 
                                 <button
-                                    type="button"
-                                    aria-label={`Add task to ${stage}`}
-                                    onClick={() => {
-                                        setStatus(stage);
-                                        setShowAddForm(true);
-                                    }}
-                                    className="p-1 mr-1 cursor-pointer rounded hover:bg-gray-200 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    onClick={() => { setStatus(STAGES[0]); setShowAddForm(true); }}
+                                    className="cursor-pointer flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-[50px] [corner-shape:squircle] bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95 text-sm"
                                 >
-                                    <svg
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M12 5v14M5 12h14"
-                                            stroke="#555"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
+                                    <IoIosAdd size={24} />
+                                    Create Task
                                 </button>
                             </div>
                         </div>
-                        <div
-                            className={`rounded-b-sm bg-slate-200 border-1 border-gray-400 overflow-hidden transition-all duration-300 ${collapsed[stage] ? "max-h-0 p-0" : "min-h-36.5 pt-2"}`}
-                            style={{
-                                maxHeight: collapsed[stage] ? 0 : 1000, // Large enough for most lists
-                                paddingTop: collapsed[stage] ? 0 : undefined,
-                                paddingBottom: collapsed[stage] ? 0 : undefined,
-                            }}
-                        >
-                            {!collapsed[stage] && (
-                                <>
-                                    {tasksByStatus[stage].length === 0 && (
-                                        <div className="text-gray-400 text-center rounded-md p-1 bg-gray-100 mx-auto w-19/20 text-sm px-2 h-full">
-                                            No tasks
-                                        </div>
-                                    )}
-                                    <ul>
-                                        {tasksByStatus[stage].map((task, i) => (
-                                            <li
-                                                key={task.id || task._id || i}
-                                                className="flex mx-auto w-19/20 flex-col px-2 py-2 bg-slate-100 rounded shadow mb-2 cursor-pointer transition hover:bg-blue-50"
-                                                onClick={() =>
-                                                    openEditModal(task.idx)
-                                                }
-                                            >
-                                                <div className="flex items-center justify-between border-b border-slate-300">
-                                                    <span className="font-medium">
-                                                        {task.title}
+                    </div>
+                </div>
+
+                {/* Scrollable Content Area */}
+                <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-12 custom-scrollbar">
+                    <div className="w-full max-w-full mx-auto">
+                        {loading ? (
+                            <SkeletonBoard />
+                        ) : (
+                            <>
+                                {search && (
+                                    <div className="mb-8 flex items-center gap-3 animate-fade-in translate-y-[-12px]">
+                                        <span className="text-xs font-black tracking-wider uppercase text-slate-400 bg-white border border-slate-200/50 px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                            {filteredTasks.length} {filteredTasks.length === 1 ? 'match' : 'matches'} found
+                                        </span>
+                                        <button
+                                            onClick={() => setSearch("")}
+                                            className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group cursor-pointer"
+                                        >
+                                            <RiCloseLine className="group-hover:rotate-90 transition-transform" />
+                                            Clear Search
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                                    {STAGES.filter(stage => search === "" || tasksByStatus[stage].length > 0).map(stage => (
+                                        <div key={stage} className={`flex flex-col w-full rounded-3xl border border-slate-200/60 overflow-hidden shadow-sm transition-all animate-fade-in ${getColumnBg(stage)}`}>
+                                            <div className={`p-4 flex items-center justify-between border-b border-slate-200/50 ${getColumnHeaderBg(stage)}`}>
+                                                <div className="flex items-center gap-2.5">
+                                                    <span className={`flex items-center px-2.5 py-1 rounded-lg text-xs font-black tracking-wider uppercase ${getStatusClasses(stage)} bg-white/60 shadow-sm border border-slate-100`}>
+                                                        <span className={`w-2 h-2 rounded-full mr-2 ${getDotColor(stage)}`} />
+                                                        {stage}
                                                     </span>
-                                                    <span className="hover:underline text-xs text-gray-400 hover:text-gray-600">
-                                                        Edit
+                                                    <span className="text-xs font-bold text-slate-400 bg-white/40 px-2 py-0.5 rounded-md">
+                                                        {tasksByStatus[stage].length}
                                                     </span>
                                                 </div>
-                                                {task.description && (
-                                                    <div className="text-xs ml-1 text-gray-500 mt-1">
-                                                        {task.description}
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </>
-                            )}
-                        </div>
+                                                <div className="flex items-center gap-1">
+                                                    <button onClick={() => { setStatus(stage); setShowAddForm(true); }} className="p-1.5 rounded-lg hover:bg-white/80 transition-colors text-slate-500 hover:text-blue-600 cursor-pointer">
+                                                        <IoIosAdd size={22} />
+                                                    </button>
+                                                    <button onClick={() => toggleCollapse(stage)} className="p-1.5 rounded-lg hover:bg-white/80 transition-colors text-slate-400 hover:text-slate-600 cursor-pointer">
+                                                        {collapsed[stage] ? <HiChevronDown size={18} /> : <HiChevronUp size={18} />}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className={`flex-1 transition-all duration-300 ease-in-out ${collapsed[stage] ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"}`}>
+                                                <div className="p-3 flex flex-col gap-3 min-h-[200px]">
+                                                    {tasksByStatus[stage].length === 0 ? (
+                                                        <div className="flex flex-col items-center justify-center py-10 px-4 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
+                                                            <RiTaskLine className="text-slate-300 text-3xl mb-2" />
+                                                            <p className="text-slate-400 text-xs font-medium italic">No tasks in {stage}</p>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col gap-3">
+                                                            {tasksByStatus[stage].map(task => (
+                                                                <div key={task.id || task._id} onClick={() => openEditModal(task.idx)} className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all cursor-pointer relative hover:-translate-y-1 duration-300">
+                                                                    <div className="flex justify-between items-start mb-3">
+                                                                        <h3 className="font-bold text-slate-800 leading-tight group-hover:text-blue-600 transition-colors text-lg">
+                                                                            {task.title}
+                                                                        </h3>
+                                                                        <MdEdit className="text-slate-300 group-hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-all text-xl shrink-0" />
+                                                                    </div>
+                                                                    {task.description && (
+                                                                        <p className="text-slate-500 text-xs line-clamp-3 leading-relaxed mb-4">
+                                                                            {task.description}
+                                                                        </p>
+                                                                    )}
+                                                                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
+                                                                        <div className="flex items-center gap-1.5 text-[10px] font-black tracking-wider text-slate-300 group-hover:text-blue-400 transition-colors">
+                                                                            <HiDotsVertical />
+                                                                            <span>DETAILS</span>
+                                                                        </div>
+                                                                        <MdArrowForward className="text-slate-200 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
-                ))}
-            </div>
-
-            {/* modal add task */}
-            {showAddForm && (
-                <div className="fixed inset-0 bg-gray-400/40 bg-opacity-30 flex items-center justify-center z-50">
-                    <form
-                        className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-4 w-[95vw] max-w-md"
-                        onSubmit={handleAddTask}
-                    >
-                        <h2 className="text-xl text-center font-bold">
-                            Add Task
-                        </h2>
-                        <input
-                            type="text"
-                            className="focus:outline-0 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
-                            placeholder="Task title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                        />
-                        <Select
-                            className="caret-transparent"
-                            options={options}
-                            value={getOptionByValue(status)}
-                            onChange={(opt) => setStatus(opt.value)}
-                            classNamePrefix="react-select"
-                        />
-                        <textarea
-                            className="focus:outline-0 min-h-25 max-h-50 focus:border-slate-400 border-1 border-slate-300 rounded px-2 py-1"
-                            placeholder="Task description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            required
-                        />
-                        <div className="flex gap-2 justify-end">
-                            <button
-                                type="button"
-                                className="cursor-pointer px-3 py-1 rounded bg-gray-200"
-                                onClick={() => setShowAddForm(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="cursor-pointer px-3 py-1 rounded bg-blue-600 text-white"
-                            >
-                                Add
-                            </button>
-                        </div>
-                    </form>
                 </div>
-            )}
 
-            {/* modal edit task */}
-            {showEditForm && (
-                <div className="fixed inset-0 bg-gray-400/40 bg-opacity-30 flex items-center justify-center z-50">
-                    <form
-                        className="bg-white p-6 rounded shadow-md flex flex-col gap-4 w-[95vw] max-w-md"
-                        onSubmit={handleEditTask}
-                    >
-                        <h2 className="text-xl text-center font-bold">
-                            Edit Task
-                        </h2>
-                        <input
-                            type="text"
-                            className="focus:outline-none border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
-                            placeholder="Task title"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            required
-                        />
-                        <Select
-                            className="focus:outline-none caret-transparent"
-                            options={options}
-                            value={getOptionByValue(editStatus)}
-                            onChange={(opt) => setEditStatus(opt.value)}
-                            classNamePrefix="react-select"
-                        />
-                        <textarea
-                            className="focus:outline-none min-h-25 max-h-50 border-1 border-slate-300 focus:border-slate-400 rounded px-2 py-1"
-                            placeholder="Task description"
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            required
-                        />
-                        <div className="flex gap-2 justify-between">
-                            <button
-                                type="button"
-                                className="cursor-pointer px-3 py-1 rounded bg-red-500 text-white"
-                                onClick={handleDeleteTask}
-                            >
-                                Delete
-                            </button>
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    className="cursor-pointer px-3 py-1 rounded bg-gray-200"
-                                    onClick={() => setShowEditForm(false)}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="cursor-pointer px-3 py-1 rounded bg-blue-600 text-white"
-                                >
-                                    Save
-                                </button>
+                {/* Modals */}
+                {showAddForm && (
+                    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                        <form className="bg-white rounded-3xl shadow-2xl flex flex-col w-full max-w-md overflow-hidden modal-animate-in" onSubmit={handleAddTask}>
+                            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                                <h2 className="text-xl font-bold text-slate-800 tracking-tight">Create New Task</h2>
+                                <button type="button" onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600 transition-colors"><RiCloseLine size={24} /></button>
                             </div>
-                        </div>
-                    </form>
-                </div>
-            )}
+                            <div className="p-6 flex flex-col gap-5">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Task Title</label>
+                                    <input type="text" className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all" placeholder="Enter title..." value={title} onChange={e => setTitle(e.target.value)} required />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Status</label>
+                                    <Select options={options} value={getOptionByValue(status)} onChange={opt => setStatus(opt.value)} menuPortalTarget={typeof document !== 'undefined' ? document.body : null} styles={{ control: (base) => ({ ...base, borderRadius: '0.75rem', borderColor: '#e2e8f0', backgroundColor: '#f8fafc' }), menuPortal: base => ({ ...base, zIndex: 9999 }) }} />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Description</label>
+                                    <textarea className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all min-h-[120px] resize-none" placeholder="Describe the task..." value={description} onChange={e => setDescription(e.target.value)} required />
+                                </div>
+                            </div>
+                            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3 justify-end">
+                                <button type="button" className="px-5 py-2 rounded-[50px] [corner-shape:squircle] bg-white border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-all text-sm" onClick={() => setShowAddForm(false)}>Cancel</button>
+                                <button type="submit" className="px-6 py-2 rounded-[50px] [corner-shape:squircle] bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg active:scale-95 text-sm">Create Task</button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+
+                {showEditForm && (
+                    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                        <form className="bg-white rounded-3xl shadow-2xl flex flex-col w-full max-w-md overflow-hidden modal-animate-in" onSubmit={handleEditTask}>
+                            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <h2 className="text-xl font-bold text-slate-800 tracking-tight">Edit Task</h2>
+                                </div>
+                                <button type="button" onClick={handleDeleteTask} className="p-2 rounded-lg text-slate-400 hover:text-red-500 transition-all hover:bg-red-50"><MdDelete size={22} /></button>
+                            </div>
+                            <div className="p-6 flex flex-col gap-5">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Task Title</label>
+                                    <input type="text" className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all" value={editTitle} onChange={e => setEditTitle(e.target.value)} required />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Status</label>
+                                    <Select options={options} value={getOptionByValue(editStatus)} onChange={opt => setEditStatus(opt.value)} menuPortalTarget={typeof document !== 'undefined' ? document.body : null} styles={{ control: (base) => ({ ...base, borderRadius: '0.75rem', borderColor: '#e2e8f0', backgroundColor: '#f8fafc' }), menuPortal: base => ({ ...base, zIndex: 9999 }) }} />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Description</label>
+                                    <textarea className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all min-h-[120px] resize-none" value={editDescription} onChange={e => setEditDescription(e.target.value)} required />
+                                </div>
+                            </div>
+                            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3 justify-end">
+                                <button type="button" className="px-5 py-2 rounded-[50px] [corner-shape:squircle] bg-white border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-all text-sm" onClick={() => setShowEditForm(false)}>Cancel</button>
+                                <button type="submit" className="px-6 py-2 rounded-[50px] [corner-shape:squircle] bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg active:scale-95 text-sm">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+            </main>
         </div>
     );
 }

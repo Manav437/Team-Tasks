@@ -37,9 +37,9 @@ export async function POST(request, { params }) {
 
         const { title, status, description } = await request.json();
 
-        if (!title || !status || !description) {
+        if (!title || !status) {
             return NextResponse.json(
-                { error: "Title, status, description are required" },
+                { error: "Title and status are required" },
                 { status: 400 },
             );
         }

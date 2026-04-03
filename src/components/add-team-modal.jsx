@@ -1,5 +1,7 @@
 import Select from "react-select";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
+import { IoIosAdd } from "react-icons/io";
+import { RiTeamLine, RiCloseLine } from "react-icons/ri";
 
 export const AddTeamModal = ({
     show,
@@ -35,84 +37,97 @@ export const AddTeamModal = ({
     if (!show) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/70 overflow-hidden">
-            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-19/20 max-w-lg border border-gray-200 relative modal-animate-in">
-                {/* <button
-                    className="cursor-pointer absolute top-1 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-                    onClick={onClose}
-                    aria-label="Close"
-                    type="button"
-                >
-                    &times;
-                </button> */}
-                <h2 className="underline underline-offset-2 text-xl text-center font-bold mb-4 text-slate-800">
-                    Add New Team
-                </h2>
-                <form onSubmit={onSubmit} className="flex flex-col gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Team Name
-                        </label>
-                        <input
-                            ref={teamNameInputRef}
-                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
-                            placeholder="Team Name"
-                            value={teamName}
-                            onChange={(e) => setTeamName(e.target.value)}
-                            required
-                        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-fade-in overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl flex flex-col w-full max-w-md overflow-hidden modal-animate-in relative">
+                <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        {/* <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg shadow-indigo-200">
+                            <RiTeamLine className="text-white text-xl" />
+                        </div> */}
+                        <h2 className="text-xl font-bold text-slate-800 tracking-tight">
+                            Create New Team
+                        </h2>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Initial Task Title{" "}
-                            <span className="text-gray-400 font-normal">
-                                (optional)
-                            </span>
-                        </label>
-                        <input
-                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-400"
-                            placeholder="Initial Task Title"
-                            value={initialTaskTitle}
-                            onChange={(e) =>
-                                setInitialTaskTitle(e.target.value)
-                            }
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Initial Task Stage
-                        </label>
-                        <Select
-                            className="w-full"
-                            options={STAGES}
-                            value={initialTaskStage}
-                            onChange={setInitialTaskStage}
-                            isDisabled={!initialTaskTitle.trim()}
-                            placeholder="Select Stage"
-                            styles={{
-                                control: (base) => ({
-                                    ...base,
-                                    borderColor: "#d1d5db",
-                                    minHeight: "38px",
-                                    boxShadow: "none",
-                                }),
-                            }}
-                        />
+                    <button
+                        onClick={onClose}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                        title="Close"
+                    >
+                        <RiCloseLine size={20} />
+                    </button>
+                </div>
+
+                <form onSubmit={onSubmit} className="flex flex-col">
+                    <div className="p-6 flex flex-col gap-5">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+                                Team Name
+                            </label>
+                            <input
+                                ref={teamNameInputRef}
+                                className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
+                                placeholder="Engineering, Design, Marketing..."
+                                value={teamName}
+                                onChange={(e) => setTeamName(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+                                Initial Task Title <span className="text-slate-300 font-normal">(Optional)</span>
+                            </label>
+                            <input
+                                className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
+                                placeholder="e.g., Set up project repository"
+                                value={initialTaskTitle}
+                                onChange={(e) => setInitialTaskTitle(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+                                Initial Task Stage
+                            </label>
+                            <Select
+                                options={STAGES}
+                                value={initialTaskStage}
+                                onChange={setInitialTaskStage}
+                                isDisabled={!initialTaskTitle.trim()}
+                                placeholder="Select Stage..."
+                                className="text-sm"
+                                classNamePrefix="react-select"
+                                menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                styles={{
+                                    control: (base) => ({
+                                        ...base,
+                                        borderRadius: '0.75rem',
+                                        borderColor: '#e2e8f0',
+                                        backgroundColor: '#f8fafc',
+                                        padding: '2px',
+                                        boxShadow: 'none',
+                                        '&:hover': { borderColor: '#2563eb' }
+                                    }),
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                }}
+                            />
+                        </div>
                     </div>
 
-                    <div className="flex gap-2 justify-end">
+                    <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3 justify-end">
                         <button
                             type="button"
-                            className="cursor-pointer px-3 py-1.5 rounded bg-gray-200"
+                            className="cursor-pointer px-5 py-2 rounded-[50px] [corner-shape:squircle] bg-white border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 transition-all text-sm"
                             onClick={onClose}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="cursor-pointer px-2 py-1.5 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
+                            className="cursor-pointer px-3.5 py-2.5 rounded-[50px] [corner-shape:squircle] bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95 text-sm flex items-center gap-2"
                         >
-                            Add Team
+                            <IoIosAdd size={22} />
+                            Create Team
                         </button>
                     </div>
                 </form>

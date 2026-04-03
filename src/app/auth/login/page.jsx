@@ -24,7 +24,7 @@ export default function LoginPage() {
     }, [status, router]);
 
     useEffect(() => {
-        document.title = "Sign in • Task Pilot";
+        document.title = "Sign in • Team Tasks";
     }, []);
 
     const handleChange = (e) => {

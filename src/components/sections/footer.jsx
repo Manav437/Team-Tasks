@@ -1,111 +1,91 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import {
+    PiTwitterLogo,
+    PiLinkedinLogo,
+    PiGithubLogo,
+    PiGlobe
+} from "react-icons/pi";
 
-const FOOTER_SECTIONS = [
+const FOOTER_LINKS = [
     {
-        title: "Index",
+        title: "Product",
         links: [
-            { label: "Explore", href: "#" },
-            { label: "Services", href: "#" },
-            { label: "About", href: "#" },
-        ],
-    },
-    {
-        title: "Products",
-        links: [
-            { label: "Supply", href: "#" },
-            { label: "Dashboard", href: "#" },
+            { label: "Features", href: "#" },
+            { label: "Dashboard", href: "/teams" },
         ],
     },
     {
         title: "Resources",
         links: [
-            { label: "Feed", href: "#" },
-            { label: "Thoughts", href: "#" },
-            { label: "Stack", href: "#" },
+            { label: "Docs", href: "#" },
+            { label: "Blog", href: "#" },
         ],
     },
     {
-        title: "Connect",
+        title: "Company",
         links: [
-            {
-                label: "Twitter",
-                href: "https://x.com/Manav437",
-                external: true,
-            },
-            {
-                label: "LinkedIn",
-                href: "https://www.linkedin.com/in/manav-gusain/",
-                external: true,
-            },
-            {
-                label: "Portfolio",
-                href: "https://manav-gusain.onrender.com/",
-                external: true,
-            },
+            { label: "About", href: "#" },
+            { label: "Privacy", href: "#" },
         ],
     },
 ];
 
-const ArrowIcon = () => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        className="absolute right-[-18px] opacity-0 group-hover:opacity-100 transition-all duration-300"
-    >
-        <path
-            fill="currentColor"
-            d="m16 8.4l-8.9 8.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7L14.6 7H7q-.425 0-.712-.288T6 6t.288-.712T7 5h10q.425 0 .713.288T18 6v10q0 .425-.288.713T17 17t-.712-.288T16 16z"
-        />
-    </svg>
-);
+const SOCIAL_LINKS = [
+    { icon: PiTwitterLogo, href: "https://x.com/Manav437", label: "Twitter" },
+    { icon: PiLinkedinLogo, href: "https://www.linkedin.com/in/manav-gusain", label: "LinkedIn" },
+    { icon: PiGithubLogo, href: "https://github.com/manav437", label: "GitHub" },
+    { icon: PiGlobe, href: "https://manavtwt.vercel.app", label: "Portfolio" },
+];
 
 export default function Footer() {
     return (
-        <footer className="w-11/12 max-w-6xl mx-auto mb-8 rounded-3xl px-8 py-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-12 bg-slate-800/95 text-slate-200">
-            <div className="flex items-center gap-4 mb-8 md:mb-0">
-                <Image
-                    alt="Globe icon"
-                    height={40}
-                    width={40}
-                    src="/footer-icon-1.png"
-                />
-                <Link href="/" className="hover:opacity-80 transition-opacity">
-                    <Image
-                        alt="TaskPilot logo"
-                        height={40}
-                        width={40}
-                        src="/footer-icon-2.png"
-                    />
-                </Link>
-            </div>
+        <footer className="w-11/12 max-w-6xl mx-auto mb-12 rounded-[50px] [corner-shape:squircle] shadow-xl p-8 md:p-12 bg-white/40 backdrop-blur-md border border-[#2c2c2c]/10 flex flex-col gap-12">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-12">
+                <div className="flex flex-col gap-4 max-w-sm">
+                    <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <Image
+                            height={32}
+                            width={32}
+                            alt="Logo"
+                            src="/team-tasks.png"
+                        />
+                        <span className="text-lg font-bold text-slate-900 tracking-tighter">
+                            Team Tasks
+                        </span>
+                    </Link>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                        The ultimate platform for modern teams to track progress and stay in sync.
+                    </p>
+                    <div className="flex items-center gap-4 mt-2">
+                        {SOCIAL_LINKS.map((social) => (
+                            <Link
+                                key={social.label}
+                                href={social.href}
+                                target="_blank"
+                                className="text-slate-400 hover:text-blue-600 transition-colors"
+                            >
+                                <social.icon className="text-xl" />
+                            </Link>
+                        ))}
+                    </div>
+                </div>
 
-            <nav className="flex-1 w-full">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
-                    {FOOTER_SECTIONS.map((section) => (
-                        <div
-                            key={section.title}
-                            className="flex flex-col items-center md:items-start gap-4"
-                        >
-                            <h4 className="font-bold text-white underline underline-offset-8 decoration-slate-600">
+                <div className="grid grid-cols-3 sm:grid-cols-3 gap-12 md:gap-20">
+                    {FOOTER_LINKS.map((section) => (
+                        <div key={section.title} className="flex flex-col gap-4">
+                            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest">
                                 {section.title}
                             </h4>
-                            <ul className="flex flex-col gap-2.5 items-center md:items-start">
+                            <ul className="flex flex-col gap-3">
                                 {section.links.map((link) => (
                                     <li key={link.label}>
                                         <Link
                                             href={link.href}
-                                            target={
-                                                link.external
-                                                    ? "_blank"
-                                                    : "_self"
-                                            }
-                                            className="relative flex items-center gap-1 cursor-pointer hover:text-blue-300 transition-colors group text-sm"
+                                            className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
                                         >
                                             {link.label}
-                                            {link.external && <ArrowIcon />}
                                         </Link>
                                     </li>
                                 ))}
@@ -113,9 +93,21 @@ export default function Footer() {
                         </div>
                     ))}
                 </div>
+            </div>
 
-                <div className="rounded-2xl mt-10 h-16 ring-2 ring-white bg-gradient-to-r from-blue-800 via-indigo-200 to-slate-400 opacity-50"></div>
-            </nav>
+            <div className="pt-8 border-t border-[#2c2c2c]/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-xs text-slate-400">
+                    © {new Date().getFullYear()} Team Tasks. All rights reserved.
+                </p>
+                <div className="flex items-center gap-6">
+                    <Link href="#" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                        Terms
+                    </Link>
+                    <Link href="#" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+                        Privacy
+                    </Link>
+                </div>
+            </div>
         </footer>
     );
 }
