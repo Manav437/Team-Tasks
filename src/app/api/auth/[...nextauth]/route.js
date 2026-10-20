@@ -25,20 +25,35 @@ export const authOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
+                if (
+                    typeof credentials?.email !== "string" ||
+                    typeof credentials?.password !== "string" ||
+                    !credentials.email.trim() ||
+                    !credentials.password
+                ) {
+                    return null;
+                }
+
+                const email = credentials.email.trim().toLowerCase();
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email },
+                    where: { email },
                 });
                 if (!user || !user.password) {
-                    throw new Error("No user found. Please sign up first.");
+                    return null;
                 }
                 const isValid = await bcrypt.compare(
                     credentials.password,
                     user.password,
                 );
                 if (!isValid) {
-                    throw new Error("Invalid credentials");
+                    return null;
                 }
-                return user;
+                return {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    image: user.image,
+                };
             },
         }),
     ],
@@ -48,6 +63,7 @@ export const authOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
         signIn: "/auth/login",
+        error: "/auth/login",
     },
     callbacks: {
         async signIn({ user, account, profile }) {

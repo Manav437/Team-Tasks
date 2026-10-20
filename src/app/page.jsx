@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import "./globals.css";
-
+import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/sections/navbar";
 import { AnnouncementBadge } from "@/components/sections/announcement-badge";
 import { Hero } from "@/components/sections/hero";
@@ -14,6 +14,7 @@ import Features from "@/components/sections/features";
 import { PiArrowRight } from "react-icons/pi";
 
 export default function Home() {
+    const { data: session } = useSession();
     const router = useRouter();
 
     return (
@@ -48,9 +49,12 @@ export default function Home() {
                     />
                 </div>
             </section>
+
             <Features />
 
-            <section className="flex flex-col items-center justify-center w-full mt-16 mb-16 px-4">
+            <FaqSection />
+
+            {!session && <section className="flex flex-col items-center justify-center w-full mt-16 mb-16 px-4">
                 <div className="max-w-xl w-full flex flex-col items-center gap-10">
                     <h2 className="text-4xl sm:text-5xl lg:text-6xl text-center font-extrabold tracking-tight text-slate-900 leading-[1.1]">
                         Start your journey <br />
@@ -67,8 +71,7 @@ export default function Home() {
                     </button>
                 </div>
             </section>
-
-            <FaqSection />
+            }
 
             <Footer />
         </main>

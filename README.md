@@ -17,19 +17,17 @@
 
 ## Tech Stack
 
-- **Framework**: [Next.js 15/16](https://nextjs.org/) (App Router)
-- **Database**: [Prisma ORM](https://www.prisma.io/) with [MongoDB](https://www.mongodb.com/)
-- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
-- **AI Engine**: [Google Generative AI (Gemini)](https://ai.google.dev/)
-- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/) (Phosphor, Material, Remix)
+- **Framework**: Next.js
+- **Database**: Prisma ORM with MongoDB
+- **Authentication**: NextAuth.js
+- **AI Engine**: Google Generative AI (Gemini)
 
 ---
 
 ## Getting Started
 
 ### 1. Prerequisites
-- Node.js 18.x or later
+- Node.js
 - A MongoDB cluster (Atlas or local)
 - Google Gemini API Key
 
@@ -61,4 +59,3 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to explore the project.
-

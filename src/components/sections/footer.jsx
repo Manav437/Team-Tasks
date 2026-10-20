@@ -41,7 +41,7 @@ const SOCIAL_LINKS = [
 
 export default function Footer() {
     return (
-        <footer className="w-11/12 max-w-6xl mx-auto mb-12 rounded-[50px] [corner-shape:squircle] shadow-xl p-8 md:p-12 bg-white/40 backdrop-blur-md border border-[#2c2c2c]/10 flex flex-col gap-12">
+        <footer className="w-11/12 max-w-5xl mx-auto mb-12 rounded-xl shadow-xl p-8 md:p-12 bg-white/40 backdrop-blur-md border border-[#2c2c2c]/10 flex flex-col gap-12">
             <div className="flex flex-col md:flex-row justify-between items-start gap-12">
                 <div className="flex flex-col gap-4 max-w-sm">
                     <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -75,7 +75,7 @@ export default function Footer() {
                 <div className="grid grid-cols-3 sm:grid-cols-3 gap-12 md:gap-20">
                     {FOOTER_LINKS.map((section) => (
                         <div key={section.title} className="flex flex-col gap-4">
-                            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest">
+                            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                                 {section.title}
                             </h4>
                             <ul className="flex flex-col gap-3">

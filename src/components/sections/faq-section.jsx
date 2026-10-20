@@ -7,7 +7,7 @@ export default function FaqSection() {
     const [openIndex, setOpenIndex] = useState(0);
 
     return (
-        <section className="w-11/12 max-w-2xl mx-auto my-16">
+        <section className="w-11/12 max-w-2xl mx-auto my-12 mb-18">
             <h2 className="text-3xl font-bold mb-10 text-center text-slate-900 tracking-tight">
                 Frequently Asked Questions
             </h2>

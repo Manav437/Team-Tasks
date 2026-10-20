@@ -61,13 +61,13 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
             role="dialog"
             aria-modal="true"
         >
-            <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] modal-animate-in">
+            <div className="bg-white w-full max-w-xl rounded-md shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] modal-animate-in">
                 <div className="mx-auto px-6 py-4">
                     <div className="flex items-center gap-2.5">
                         {/* <div className="bg-indigo-600 p-1.5 rounded-lg shadow-indigo-200 shadow-lg">
                             <RiGeminiFill className="text-white text-xl" />
                         </div> */}
-                        <h2 className="text-xl font-bold text-slate-800 tracking-tight">AI Summary</h2>
+                        <h2 className="text-xl font-bold text-black tracking-normal">A.I. Summary</h2>
                     </div>
                 </div>
 
@@ -75,7 +75,7 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-20 animate-pulse">
                             <div className="ai-loader mb-6" />
-                            <p className="text-indigo-600 font-medium tracking-wide">
+                            <p className="text-black font-medium tracking-wide">
                                 Analyzing team performance...
                             </p>
                             <p className="text-slate-400 text-sm mt-1">Gemini is thinking</p>
@@ -92,10 +92,10 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
                             {!isLoading && summary && !isTyping && (
                                 <button
                                     onClick={handleCopy}
-                                    className="cursor-pointer absolute top-2 right-2 p-2 rounded-lg bg-white shadow-sm border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all active:scale-90"
+                                    className="cursor-pointer absolute top-2 right-2 p-1.5 rounded-md border hover:shadow-sm  border-slate-200 text-slate-500 hover:text-slate-700 hover:border-indigo-200"
                                     title="Copy to clipboard"
                                 >
-                                    {copied ? <RiCheckLine className="text-green-500" /> : <RiFileCopyLine />}
+                                    {copied ? <RiCheckLine size={16} className="text-green-500" /> : <RiFileCopyLine size={16} />}
                                 </button>
                             )}
                         </div>
@@ -104,12 +104,12 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
 
                 <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                        <RiGeminiFill className="text-indigo-500 text-sm" />
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Powered by Gemini AI</span>
+                        <RiGeminiFill className="text-slate-700 text-sm" />
+                        <span className="text-xs font-semibold text-slate-400">Powered by <span className="text-slate-600 font-bold tracking-wide underline uppercase underline-offset-2">Gemini AI</span></span>
                     </div>
                     <button
                         onClick={onClose}
-                        className="cursor-pointer hover:underline underline-offset-2 text-sm font-semibold text-indigo-600 hover:bg-black/5 px-2 py-1 rounded-lg hover:text-indigo-700 transition-colors"
+                        className="cursor-pointer text-sm ring-2 ring-rose-200 font-semibold text-rose-600 bg-rose-100 hover:bg-rose-200 px-2 py-1 rounded-md hover:text-rose-700 transition-colors"
                     >
                         Close
                     </button>

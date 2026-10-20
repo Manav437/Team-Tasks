@@ -30,31 +30,31 @@ export const BrandedLoader = ({ message = "Synchronizing Workspace..." }) => {
 
 export const SkeletonGrid = ({ count = 6 }) => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 w-full animate-fade-in">
+        <div role="status" aria-label="Loading teams" className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 w-full">
             {[...Array(count)].map((_, i) => (
-                <div key={i} className="bg-white/40 backdrop-blur-sm border border-slate-100 rounded-3xl p-6 shadow-sm overflow-hidden relative">
-                    <div className="flex justify-between items-start mb-8">
+                <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 overflow-hidden relative">
+                    <div className="flex justify-between items-start mb-5">
                         <div className="w-12 h-6 bg-slate-100 rounded-lg animate-pulse" />
                         <div className="flex gap-2">
                             <div className="w-8 h-8 bg-slate-100 rounded-xl animate-pulse" />
                             <div className="w-8 h-8 bg-slate-100 rounded-xl animate-pulse" />
                         </div>
                     </div>
-                    
-                    <div className="mb-8 space-y-3">
-                        <div className="h-8 bg-slate-100 rounded-xl w-3/4 animate-pulse" />
+
+                    <div className="mb-5 space-y-3">
+                        <div className="h-5 bg-slate-100 rounded w-3/4 animate-pulse" />
                         <div className="space-y-1.5">
                             <div className="h-3 bg-slate-100/50 rounded-full w-1/4 animate-pulse" />
-                            <div className="h-2.5 bg-slate-100 rounded-full w-full animate-pulse opacity-50" />
+                            <div className="h-1 bg-slate-100 rounded-full w-full animate-pulse opacity-50" />
                         </div>
                     </div>
-                    
+
                     <div className="mt-auto pt-4 border-t border-slate-50/50 flex justify-between items-center">
                         <div className="w-32 h-4 bg-slate-50 rounded animate-pulse" />
                         <div className="w-6 h-6 bg-slate-50 rounded-full animate-pulse" />
                     </div>
 
-                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+
                 </div>
             ))}
         </div>
@@ -71,10 +71,10 @@ export const SkeletonBoard = () => {
                         <div className="w-24 h-4 bg-slate-100 rounded-full animate-pulse" />
                         <div className="w-6 h-5 bg-slate-50 rounded-full animate-pulse" />
                     </div>
-                    
+
                     <div className="space-y-4">
                         {[...Array(2)].map((_, j) => (
-                            <div key={j} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4 relative overflow-hidden">
+                            <div key={j} className="bg-white p-4 rounded-xl border border-slate-200 space-y-4 relative overflow-hidden">
                                 <div className="h-6 bg-slate-50 rounded-lg w-5/6 animate-pulse" />
                                 <div className="space-y-2">
                                     <div className="h-2 bg-slate-50 rounded-full w-full animate-pulse" />

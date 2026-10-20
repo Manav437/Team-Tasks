@@ -59,7 +59,7 @@ export default function SignUp() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[url('/background-auth.webp')] bg-cover bg-center bg-no-repeat">
+        <div className="min-h-screen w-full flex items-center justify-center bg-black bg-[url('/background-auth.jpg')] bg-cover bg-center bg-no-repeat">
             <button
                 onClick={() => router.back()}
                 className="cursor-pointer text-white text-sm px-2 py-2 absolute top-6 left-6 group flex items-center justify-center gap-2 rounded-md hover:bg-white/20 transition-all duration-300 active:scale-90"
@@ -142,7 +142,7 @@ export default function SignUp() {
                             </label>
                             <input
                                 autoComplete="off"
-                                className="w-full px-3 py-2.5 mb-2 text-white focus:bg-white/5 [corner-shape:squircle] rounded-[50px] border border-zinc-800 duration-200 focus:ring-2 focus:ring-zinc-700 focus:outline-0"
+                                className="w-full px-3 py-2.5 mb-2 text-white focus:bg-white/5 [corner-shape:squircle] rounded-[50px] border border-zinc-800 duration-200 focus:ring-2 focus:ring-zinc-700 focus:outline-none"
                                 type="email"
                                 name="email"
                                 value={form.email}
@@ -160,7 +160,7 @@ export default function SignUp() {
                                     autoComplete="new-password"
                                     className="w-full pl-4 pr-12 py-2.5 text-white bg-transparent border border-zinc-800
                                                [corner-shape:squircle] rounded-[50px] duration-200
-                                               focus:bg-white/5 focus:ring-2 focus:ring-zinc-700 focus:outline-0
+                                               focus:bg-white/5 focus:ring-2 focus:ring-zinc-700 focus:outline-none
                                                placeholder:text-white/20"
                                     type={showPassword ? "text" : "password"}
                                     name="password"

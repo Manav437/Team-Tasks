@@ -30,10 +30,10 @@ export default function NotFound() {
                         </h2>
                     </div>
                 </div>
-                <p className="text-slate-600 mb-2 text-start rounded-md text-[15px] border-l-4 border-indigo-400 pl-1.5">
+                <p className="text-slate-600 mb-2 text-start rounded-md text-[15px]">
                     This page took a wrong turn at{" "}
                     <a
-                        className="text-indigo-400 italic hover:text-indigo-500 underline"
+                        className="text-slate-400 italic hover:text-slate-500 underline"
                         target="_blank"
                         rel="noopener noreferrer"
                         href="https://en.wikipedia.org/wiki/Breaking_Bad"
@@ -48,7 +48,7 @@ export default function NotFound() {
                     className="group flex items-center mx-auto justify-between gap-2 transition-all duration-300 bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:bg-slate-800 active:scale-95"
                 >
                     Go back Home
-                    <PiArrowRight className="transition-transform group-hover:translate-x-1" />
+                    <PiArrowRight className="transition-transform group-hover:translate-x-[1.5px]" size={15} />
                 </Link>
             </section>
         </main>

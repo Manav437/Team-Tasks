@@ -46,7 +46,7 @@ export default function Features() {
         <section className="mt-24 flex flex-col items-center w-full px-4 mb-24">
             <div className="max-w-5xl w-full">
                 <div className="flex flex-col items-center mb-16 space-y-4">
-                    <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider border border-blue-100/50 shadow-sm">
+                    <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold border border-blue-100/50 shadow-sm">
                         Powerful Features
                     </span>
                     <h2 className="text-4xl md:text-6xl font-extrabold text-center text-slate-900 tracking-tight leading-[1.1]">
@@ -69,15 +69,15 @@ export default function Features() {
 
                                 <div className="relative p-8 pb-0 z-10">
                                     <div className="flex items-center justify-between mb-4">
-                                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-slate-900 group-hover:bg-white group-hover:scale-110 transition-all duration-500 shadow-sm">
+                                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-slate-900 group-hover:bg-white group-hover:scale-105 transition-all duration-500 shadow-sm">
                                             <Icon className="text-xl" />
                                         </div>
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-blue-500 transition-colors">
+                                        <span className="text-[10px] font-bold uppercase text-slate-400 group-hover:text-blue-500 transition-colors">
                                             0{idx + 1}
                                         </span>
                                     </div>
 
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight group-hover:translate-x-1 transition-transform duration-500">
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight transition-transform duration-500">
                                         {feature.title}
                                     </h3>
                                     <p className="text-slate-500 text-sm leading-relaxed max-w-[90%] group-hover:text-slate-600 transition-colors">
@@ -85,7 +85,7 @@ export default function Features() {
                                     </p>
                                 </div>
 
-                                <div className="relative mt-auto pt-8 px-6 pb-6 z-10">
+                                <div className="relative mt-auto pt-8 px-6 z-10">
                                     <div className={`relative group/image overflow-hidden rounded-md border border-slate-200/50 bg-slate-50/50 shadow-xl shadow-slate-200/20 aspect-[4/3] md:aspect-auto md:h-64`}>
                                         <Image
                                             className="object-cover object-top transition-all duration-1000 group-hover:scale-101"
@@ -98,9 +98,9 @@ export default function Features() {
                                     </div>
                                 </div>
 
-                                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                                {/* <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
-                                </div>
+                                </div>*/}
                             </div>
                         );
                     })}

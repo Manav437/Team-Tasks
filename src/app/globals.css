@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 body,
 html {
     padding: 0;
@@ -14,18 +15,24 @@ body {
 }
 
 @keyframes float {
+
     0%,
     100% {
         transform: translate(0, 0) scale(1);
-        opacity: 0.3; /* Base visibility */
+        opacity: 0.3;
+        /* Base visibility */
     }
+
     33% {
         transform: translate(30px, -50px) scale(1.1);
-        opacity: 0.5; /* Brightest when largest */
+        opacity: 0.5;
+        /* Brightest when largest */
     }
+
     66% {
         transform: translate(-20px, 20px) scale(0.9);
-        opacity: 0.2; /* Faintest when smallest */
+        opacity: 0.2;
+        /* Faintest when smallest */
     }
 }
 
@@ -51,6 +58,7 @@ button:focus {
     0% {
         transform: translateX(0);
     }
+
     100% {
         transform: translateX(-50%);
     }
@@ -95,6 +103,7 @@ button:focus {
         opacity: 0;
         transform: scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -117,6 +126,7 @@ button:focus {
     animation: rotation 1s linear infinite;
     position: relative;
 }
+
 .ai-loader:after {
     content: "";
     box-sizing: border-box;
@@ -136,13 +146,23 @@ button:focus {
 }
 
 @keyframes rotation {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .animate-spin-slow {
@@ -150,8 +170,13 @@ button:focus {
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .animate-shimmer {
@@ -162,6 +187,7 @@ button:focus {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(-360deg);
     }
@@ -169,12 +195,10 @@ button:focus {
 
 /* AI Shimmer effect */
 .ai-shimmer {
-    background: linear-gradient(
-        90deg,
-        rgba(99, 102, 241, 0.1) 25%,
-        rgba(99, 102, 241, 0.2) 50%,
-        rgba(99, 102, 241, 0.1) 75%
-    );
+    background: linear-gradient(90deg,
+            rgba(99, 102, 241, 0.1) 25%,
+            rgba(99, 102, 241, 0.2) 50%,
+            rgba(99, 102, 241, 0.1) 75%);
     background-size: 200% 100%;
     animation: shimmer 2s infinite linear;
 }
@@ -183,6 +207,7 @@ button:focus {
     0% {
         background-position: 200% 0;
     }
+
     100% {
         background-position: -200% 0;
     }
@@ -196,10 +221,12 @@ button:focus {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
 }
+
 .animate-fade-in {
     animation: fade-in 0.2s ease;
 }
@@ -211,6 +238,7 @@ button:focus {
     color: #303132;
     padding-left: 0em;
 }
+
 .prose ul ul {
     margin-left: 1em;
     list-style-type: "- ";

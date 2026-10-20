@@ -8,6 +8,17 @@ import { MdArrowBackIosNew } from "react-icons/md";
 import { PiArrowRight, PiEye, PiEyeSlash } from "react-icons/pi";
 import "../../globals.css";
 
+const AUTH_ERRORS = {
+    CredentialsSignin: "Incorrect email or password. If you registered with Google, use Sign in with Google.",
+    OAuthSignin: "Could not connect to Google. Please try again. If this continues, check the Google OAuth configuration and server logs.",
+    OAuthCallback: "Google sign-in could not be completed. Check the server logs and database connection.",
+    OAuthCreateAccount: "Could not create your Google account. Check the database connection and server logs.",
+    OAuthAccountNotLinked: "An account already exists with this email. Sign in using your original method; Google is not linked to that account.",
+    AccessDenied: "Sign-in was denied. Please use a Google account with a verified email address.",
+    Configuration: "Authentication is not configured correctly. Check the server logs.",
+    Default: "Sign-in failed. Please try again or check the server logs.",
+};
+
 export default function LoginPage() {
     const [form, setForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
@@ -25,6 +36,10 @@ export default function LoginPage() {
 
     useEffect(() => {
         document.title = "Sign in • Team Tasks";
+        const authError = new URLSearchParams(window.location.search).get("error");
+        if (authError) {
+            setError(AUTH_ERRORS[authError] || AUTH_ERRORS.Default);
+        }
     }, []);
 
     const handleChange = (e) => {
@@ -36,24 +51,30 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
 
-        const res = await signIn("credentials", {
-            redirect: false,
-            email: form.email,
-            password: form.password,
-            callbackUrl: "/teams",
-        });
+        try {
+            const res = await signIn("credentials", {
+                redirect: false,
+                email: form.email.trim().toLowerCase(),
+                password: form.password,
+                callbackUrl: "/teams",
+            });
 
-        setLoading(false);
-
-        if (res?.error) {
-            setError(res.error || "Login failed");
-        } else if (res?.ok) {
-            router.push("/teams");
+            if (res?.error) {
+                setError(AUTH_ERRORS[res.error] || AUTH_ERRORS.Default);
+            } else if (res?.ok) {
+                router.push("/teams");
+            } else {
+                setError(AUTH_ERRORS.Default);
+            }
+        } catch {
+            setError("Unable to reach the sign-in service. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[url('/background-auth.webp')] bg-cover bg-center bg-no-repeat relative">
+        <div className="min-h-screen w-full flex items-center justify-center bg-black bg-[url('/background-auth.jpg')] bg-cover bg-center bg-no-repeat relative">
             <button
                 onClick={() => router.back()}
                 className="cursor-pointer text-white text-sm px-2 py-2 absolute top-6 left-6 group flex items-center justify-center gap-2 rounded-md hover:bg-white/20 transition-all duration-300 active:scale-90"
@@ -122,7 +143,7 @@ export default function LoginPage() {
                                 Email
                             </label>
                             <input
-                                className="w-full px-4 py-2.5 mb-4 text-white focus:bg-white/5 border border-white/10 [corner-shape:squircle] rounded-[50px] duration-200 focus:ring-2 focus:ring-white/20 focus:outline-0 placeholder:text-white/20"
+                                className="w-full px-4 py-2.5 mb-4 text-white focus:bg-white/5 border border-white/10 [corner-shape:squircle] rounded-[50px] duration-200 focus:ring-2 focus:ring-white/20 focus:outline-none placeholder:text-white/20"
                                 type="email"
                                 name="email"
                                 value={form.email}
@@ -139,7 +160,7 @@ export default function LoginPage() {
                                 <input
                                     className="w-full pl-4 pr-12 py-2.5 text-white focus:bg-white/5 border border-white/10
                                                [corner-shape:squircle] rounded-[50px] duration-200
-                                               focus:ring-2 focus:ring-white/20 focus:outline-0
+                                               focus:ring-2 focus:ring-white/20 focus:outline-none
                                                placeholder:text-white/20"
                                     type={showPassword ? "text" : "password"}
                                     name="password"
@@ -189,7 +210,7 @@ export default function LoginPage() {
                             )}
 
                             <button
-                                className="group flex items-center justify-center w-full py-3
+                                className="group flex items-center justify-center w-full py-2.5
                                 bg-zinc-900 text-white rounded-[50px] font-semibold
                                 shadow-xl ring-2 ring-white/10 [corner-shape:squircle]
                                 transition-all duration-300 ease-in-out cursor-pointer

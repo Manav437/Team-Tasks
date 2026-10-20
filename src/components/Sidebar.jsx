@@ -1,203 +1,174 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { MdLogout, MdMenu, MdClose, MdWork } from "react-icons/md";
-import { HiUserGroup } from "react-icons/hi"
-import { IoIosSettings } from "react-icons/io"
+import { usePathname } from "next/navigation";
+import { RiCloseLine, RiGroupLine, RiLogoutBoxRLine, RiMenuLine, RiSettings3Line, RiBriefcase4Line } from "react-icons/ri";
 
 const navLinks = [
-    {
-        href: "/teams",
-        label: "Teams",
-        icon: <HiUserGroup size={20} />,
-    },
-    {
-        href: "/work",
-        label: "Work",
-        icon: <MdWork size={20} />,
-    },
-    {
-        href: "/settings",
-        label: "Settings",
-        icon: <IoIosSettings size={20} />,
-    },
+    { href: "/teams", label: "Teams", icon: RiGroupLine },
+    { href: "/work", label: "Work", icon: RiBriefcase4Line },
+    { href: "/settings", label: "Settings", icon: RiSettings3Line },
 ];
 
-export function Sidebar() {
-    const pathname = usePathname();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { data: session, status } = useSession();
-    const router = useRouter();
+const focusRing = "focus-visible:ring-2 focus-visible:ring-blue-300";
 
-    const fallbackImage =
-        "https://i.pinimg.com/736x/08/35/0c/08350cafa4fabb8a6a1be2d9f18f2d88.jpg";
+function Brand({ onClick }) {
+    return (
+        <Link href="/" onClick={onClick} className={`flex w-fit items-center gap-2.5 rounded-lg ${focusRing}`}>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800">
+                <Image src="/team-tasks.png" alt="" width={21} height={21} className="brightness-0 invert" />
+            </span>
+            <span className="text-base font-semibold tracking-tight text-slate-900">Team Tasks</span>
+        </Link>
+    );
+}
 
-    const imageSrc =
-        status === "authenticated" && session?.user?.image
-            ? session.user.image
-            : fallbackImage;
+function Avatar({ src, name }) {
+    const [failed, setFailed] = useState(false);
+    const initials = name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
-    const NavContent = ({ mobile = false }) => (
-        <nav className="flex-1 flex flex-col gap-1.5 mt-6 px-3">
-            {navLinks.map((link) => {
-                const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+    return (
+        <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-xs font-medium text-slate-600">
+            {src && !failed ? (
+                <Image src={src} alt="" width={32} height={32} className="h-full w-full object-cover" onError={() => setFailed(true)} />
+            ) : initials}
+        </span>
+    );
+}
+
+function Navigation({ pathname, onNavigate }) {
+    return (
+        <nav aria-label="Main navigation" className="flex-1 space-y-1 px-3 py-6">
+            {navLinks.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href || pathname.startsWith(`${href}/`);
                 return (
                     <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => mobile && setSidebarOpen(false)}
-                        className={`
-                            group flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all duration-300 relative overflow-hidden
-                            ${isActive
-                                ? "text-[#2c2c2c] bg-[#2c2c2c]/10 shadow-sm shadow-[#2c2c2c]/5"
-                                : "text-[#2c2c2c]/70 hover:text-slate-900 hover:bg-slate-50"
-                            }
-                        `}
+                        key={href}
+                        href={href}
+                        onClick={onNavigate}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${focusRing} ${active
+                            ? "bg-blue-50 font-medium text-blue-700"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
                     >
-                        <span className={`transition-all duration-300 ${isActive ? "scale-110" : "group-hover:scale-105"}`}>
-                            {link.icon}
-                        </span>
-
-                        <span className="text-sm tracking-tight">{link.label}</span>
+                        <Icon size={18} aria-hidden="true" />
+                        {label}
                     </Link>
                 );
             })}
         </nav>
     );
+}
+
+function Account({ name, email, image }) {
+    return (
+        <div className="mx-4 border-t border-slate-200 py-4">
+            <div className="flex items-center gap-2.5 px-1 py-1">
+                <Avatar key={image || "initials"} src={image} name={name} />
+                <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-800" title={name}>{name}</p>
+                    {email && <p className="mt-0.5 truncate text-xs text-slate-500" title={email}>{email}</p>}
+                </div>
+            </div>
+            <button
+                type="button"
+                className={`mt-3 flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-sm text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 ${focusRing}`}
+                onClick={() => {
+                    if (window.confirm("Are you sure you want to log out?")) {
+                        signOut({ callbackUrl: "/auth/login" });
+                    }
+                }}
+            >
+                <RiLogoutBoxRLine size={17} aria-hidden="true" />
+                Sign out
+            </button>
+        </div>
+    );
+}
+
+export function Sidebar() {
+    const pathname = usePathname();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const dialogRef = useRef(null);
+    const { data: session } = useSession();
+    const name = session?.user?.name || session?.user?.email?.split("@")[0] || "User";
+    const email = session?.user?.email;
+    const image = session?.user?.image;
+    const closeSidebar = () => setSidebarOpen(false);
+
+    useEffect(() => {
+        if (!sidebarOpen) return;
+
+        const dialog = dialogRef.current;
+        dialog.showModal();
+        const desktop = window.matchMedia("(min-width: 768px)");
+        const handleResize = () => {
+            if (desktop.matches) setSidebarOpen(false);
+        };
+        handleResize();
+        desktop.addEventListener("change", handleResize);
+
+        return () => {
+            desktop.removeEventListener("change", handleResize);
+            dialog.close();
+        };
+    }, [sidebarOpen]);
 
     return (
         <>
-            <aside className="w-[240px] min-w-[240px] hidden md:flex h-screen sticky top-0 self-start z-40 bg-white/80 backdrop-blur-xl border-r border-slate-200/50 flex flex-col pt-4">
-                <div
-                    className="flex items-center gap-3 px-6 h-12 mb-4 cursor-pointer group"
-                    onClick={() => router.push("/")}
-                >
-                    <div className="bg-[#2c2c2c] p-1.5 rounded-md shadow-lg shadow-sky-100 group-hover:scale-103 duration-300 transition-transform">
-                        <Image
-                            alt="task-teams-logo"
-                            height={24}
-                            width={24}
-                            src="/team-tasks.png"
-                            className="brightness-0 invert"
-                        />
-                    </div>
-                    <span className="text-slate-900 font-black text-xl tracking-tight">
-                        Team Tasks
-                    </span>
+            <aside className="sticky top-0 hidden h-dvh w-56 shrink-0 self-start flex-col overflow-y-auto border-r border-slate-200 bg-white md:flex">
+                <div className="px-6 pt-8 pb-2">
+                    <Brand />
                 </div>
-
-                <div className="w-full bg-slate-200 h-[1px]" />
-
-                <NavContent />
-
-                <div className="p-4 mt-auto border-t border-t-slate-200">
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 shadow-inner group">
-                        <div className="flex items-center gap-3 mb-3 px-1">
-                            <div className="relative">
-                                <Image
-                                    src={imageSrc}
-                                    alt="Profile"
-                                    width={38}
-                                    height={38}
-                                    className="rounded-xl object-cover ring-2 ring-white shadow-sm"
-                                    onError={(e) => { e.currentTarget.src = fallbackImage; }}
-                                />
-                                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                                <span className="font-bold text-slate-800 text-sm truncate uppercase tracking-tight">
-                                    {session?.user?.name || session?.user?.email?.split("@")[0] || "User"}
-                                </span>
-                                <span className="text-[10px] font-black text-slate-400 tracking-wide uppercase">Pro Subscription</span>
-                            </div>
-                        </div>
-
-                        <button
-                            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all cursor-pointer group/logout"
-                            onClick={() => {
-                                if (window.confirm("Are you sure you want to log out?")) {
-                                    signOut({ callbackUrl: "/auth/login" });
-                                }
-                            }}
-                        >
-                            <span className="text-xs font-bold uppercase tracking-wider">Sign Out</span>
-                            <MdLogout className="group-hover/logout:translate-x-[1.5px] transition-transform" />
-                        </button>
-                    </div>
-                </div>
+                <Navigation pathname={pathname} />
+                <Account name={name} email={email} image={image} />
             </aside>
 
-            <header className="md:hidden fixed top-4 left-4 right-4 h-16 bg-white/70 backdrop-blur-md border border-white/40 shadow-xl shadow-slate-200/50 rounded-2xl z-50 flex items-center justify-between px-4 animate-fade-in">
+            <header className="fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 md:hidden">
                 <button
-                    className="p-2 rounded-xl bg-slate-50 text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
+                    type="button"
+                    aria-label="Open navigation"
+                    aria-expanded={sidebarOpen}
+                    aria-controls="mobile-sidebar"
+                    className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 ${focusRing}`}
                     onClick={() => setSidebarOpen(true)}
                 >
-                    <MdMenu size={24} />
+                    <RiMenuLine size={21} />
                 </button>
-
-                <div
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={() => router.push("/")}
-                >
-                    <div className="bg-indigo-600 p-1 rounded-lg">
-                        <Image alt="logo" height={20} width={20} src="/team-tasks.png" className="brightness-0 invert" />
-                    </div>
-                    <span className="font-black text-slate-900 tracking-tight text-lg">Team Tasks</span>
-                </div>
-
-                <div className="relative w-9 h-9">
-                    <Image
-                        src={imageSrc}
-                        alt="Profile"
-                        width={36}
-                        height={36}
-                        className="rounded-xl object-cover ring-2 ring-indigo-50/50 shadow-sm"
-                    />
-                </div>
+                <Brand />
+                <Avatar key={image || "initials"} src={image} name={name} />
             </header>
 
-            <div className={`fixed inset-0 z-[60] md:hidden transition-all duration-300 ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
-                <div
-                    className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
-                    onClick={() => setSidebarOpen(false)}
-                />
-
-                <aside className={`absolute top-0 left-0 bottom-0 w-[280px] bg-white/95 backdrop-blur-xl shadow-2xl transition-transform duration-300 flex flex-col pt-6 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-                    <div className="flex items-center justify-between px-6 mb-8">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-indigo-600 p-1.5 rounded-xl">
-                                <Image alt="logo" height={22} width={22} src="/team-tasks.png" className="brightness-0 invert" />
-                            </div>
-                            <span className="font-black text-slate-900 tracking-tighter text-xl">Team Tasks</span>
-                        </div>
+            <dialog
+                ref={dialogRef}
+                id="mobile-sidebar"
+                aria-label="Navigation"
+                onClose={closeSidebar}
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) closeSidebar();
+                }}
+                className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-slate-900/30"
+            >
+                <div className="flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-slate-200 bg-white">
+                    <div className="flex items-center justify-between gap-3 px-5 pt-6 pb-2">
+                        <Brand onClick={closeSidebar} />
                         <button
-                            className="p-2 rounded-xl text-slate-400 hover:bg-slate-50 cursor-pointer"
-                            onClick={() => setSidebarOpen(false)}
+                            type="button"
+                            aria-label="Close navigation"
+                            className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 ${focusRing}`}
+                            onClick={closeSidebar}
                         >
-                            <MdClose size={24} />
+                            <RiCloseLine size={21} />
                         </button>
                     </div>
-
-                    <NavContent mobile />
-
-                    <div className="p-6 mt-auto">
-                        <button
-                            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-red-50 text-red-600 font-bold text-sm tracking-wide active:scale-95 transition-all shadow-sm shadow-red-100/50"
-                            onClick={() => {
-                                if (window.confirm("Are you sure you want to log out?")) {
-                                    signOut({ callbackUrl: "/auth/login" });
-                                }
-                            }}
-                        >
-                            <MdLogout size={20} />
-                            SIGN OUT
-                        </button>
-                    </div>
-                </aside>
-            </div>
+                    <Navigation pathname={pathname} onNavigate={closeSidebar} />
+                    <Account name={name} email={email} image={image} />
+                </div>
+            </dialog>
         </>
     );
 }
