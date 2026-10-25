@@ -14,7 +14,7 @@ export default function WorkPage() {
             <Sidebar />
 
             <main className="min-w-0 flex-1 h-dvh overflow-auto">
-                <div className="max-w-6xl mx-auto px-2 sm:px-4 pt-28 md:pt-10 pb-12">
+                <div className="w-full px-2 sm:px-4 pt-28 md:pt-10 pb-12">
                     <header className="mb-6 border-b border-black/30 pb-2">
                         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Work</h1>
                         <p className="mt-2 text-sm text-slate-500">

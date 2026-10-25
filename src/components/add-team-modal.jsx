@@ -3,6 +3,12 @@ import { useEffect } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { RiCloseLine } from "react-icons/ri";
 
+const statusDotColors = {
+    "Not Started": "bg-slate-400",
+    "In Progress": "bg-blue-500",
+    Completed: "bg-emerald-500",
+};
+
 export const AddTeamModal = ({
     show,
     onClose,
@@ -95,6 +101,12 @@ export const AddTeamModal = ({
                                 inputId="initial-task-stage"
                                 instanceId="initial-task-stage"
                                 options={STAGES}
+                                formatOptionLabel={(option) => (
+                                    <span className="flex items-center">
+                                        <span aria-hidden="true" className={`mr-2 h-2 w-2 shrink-0 rounded-full ${statusDotColors[option.value] || "bg-slate-400"}`} />
+                                        {option.label}
+                                    </span>
+                                )}
                                 value={initialTaskStage}
                                 onChange={setInitialTaskStage}
                                 isDisabled={!initialTaskTitle.trim()}

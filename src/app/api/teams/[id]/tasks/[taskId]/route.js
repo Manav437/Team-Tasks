@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+import { parseDueDate } from "@/utils/due-date.mjs";
+
 const prisma = new PrismaClient();
 
 export async function PUT(request, { params }) {
@@ -45,7 +47,13 @@ export async function PUT(request, { params }) {
             );
         }
 
-        const { title, status, description } = await request.json();
+        const { title, status, description, dueDate } = await request.json();
+        let parsedDueDate;
+        try {
+            parsedDueDate = dueDate === undefined ? undefined : parseDueDate(dueDate);
+        } catch (error) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
+        }
 
         if (!title || !status) {
             return NextResponse.json(
@@ -60,6 +68,7 @@ export async function PUT(request, { params }) {
                 title,
                 status,
                 description,
+                dueDate: parsedDueDate,
             },
         });
 

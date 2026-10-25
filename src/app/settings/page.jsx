@@ -16,13 +16,13 @@ export default function SettingsPage() {
             <Sidebar />
 
             <main className="min-w-0 flex-1 h-dvh overflow-auto">
-                <div className="max-w-6xl mx-auto px-2 sm:px-4 pt-28 md:pt-10 pb-12">
+                <div className="w-full px-2 sm:px-4 pt-28 md:pt-10 pb-12">
                     <header className="mb-6 border-b border-black/30 pb-2">
                         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Settings</h1>
                         <p className="mt-2 text-sm text-slate-500">Workspace and account preferences.</p>
                     </header>
 
-                    <section aria-labelledby="preferences-heading" className="rounded-xl border border-slate-200 bg-white">
+                    <section aria-labelledby="preferences-heading" className="w-full rounded-xl border border-slate-200 bg-white">
                         <div className="border-b border-slate-200 px-4 py-4 sm:px-5">
                             <h2 id="preferences-heading" className="text-sm font-semibold text-slate-900">Preferences</h2>
                         </div>

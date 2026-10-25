@@ -149,11 +149,12 @@ export default function TeamsPage() {
                 }),
             });
 
-            const { summary } = await res.json();
-            setSummaryContent(summary);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to generate summary");
+            setSummaryContent(data.summary);
         } catch (err) {
             console.error("Failed to get AI summary:", err);
-            setSummaryContent("⚠️ Failed to generate summary.");
+            setSummaryContent(`⚠️ ${err.message || "Failed to generate summary."}`);
         } finally {
             setIsSummarizing(false);
         }
@@ -164,7 +165,7 @@ export default function TeamsPage() {
             <Sidebar />
 
             <main className="min-w-0 flex-1 h-dvh overflow-y-auto">
-                <div className="max-w-6xl mx-auto px-2 sm:px-4 pt-28 md:pt-10 pb-12">
+                <div className="w-full px-2 sm:px-4 pt-28 md:pt-10 pb-12">
                     <div className="border-b border-black/30 pb-2 mb-6">
                         <div className="">
                             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
@@ -212,7 +213,7 @@ export default function TeamsPage() {
                     </div>
 
                     <div className="">
-                        <div className="max-w-6xl mx-auto">
+                        <div className="w-full">
                             {error && (
                                 <p role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
                             )}

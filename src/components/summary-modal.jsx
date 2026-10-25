@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { marked } from "marked";
+import ReactMarkdown from "react-markdown";
 import { RiGeminiFill, RiCloseLine, RiFileCopyLine, RiCheckLine } from "react-icons/ri";
 
 export default function SummaryModal({ open, isLoading, summary, onClose }) {
@@ -10,42 +10,38 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
     const [isTyping, setIsTyping] = useState(false);
 
     useEffect(() => {
-        if (open) {
-            document.body.style.overflow = "hidden";
-            setCopied(false);
-            if (!isLoading && summary) {
-                startTypewriter(summary);
+        if (!open) return;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        setCopied(false);
+        setDisplayedSummary("");
+        setIsTyping(false);
+        let timer;
+        if (!isLoading && summary) {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                setDisplayedSummary(summary);
+            } else {
+                setIsTyping(true);
+                let length = 0;
+                timer = setInterval(() => {
+                    length += 5;
+                    setDisplayedSummary(summary.slice(0, length));
+                    if (length >= summary.length) {
+                        setIsTyping(false);
+                        clearInterval(timer);
+                    }
+                }, 10);
             }
-        } else {
-            document.body.style.overflow = "";
-            setDisplayedSummary("");
         }
-
         return () => {
-            document.body.style.overflow = "";
+            clearInterval(timer);
+            document.body.style.overflow = previousOverflow;
         };
     }, [open, isLoading, summary]);
 
-    const startTypewriter = (text) => {
-        setIsTyping(true);
-        setDisplayedSummary("");
-        let i = 0;
-        const speed = 2;
-
-        const timer = setInterval(() => {
-            setDisplayedSummary(text.slice(0, i));
-            i += 5;
-            if (i > text.length) {
-                setDisplayedSummary(text);
-                setIsTyping(false);
-                clearInterval(timer);
-            }
-        }, 10);
-    };
-
-    const handleCopy = () => {
+    const handleCopy = async () => {
         try {
-            navigator.clipboard.writeText(summary);
+            await navigator.clipboard.writeText(summary);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
@@ -60,6 +56,7 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="ai-summary-title"
         >
             <div className="bg-white w-full max-w-xl rounded-md shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] modal-animate-in">
                 <div className="mx-auto px-6 py-4">
@@ -67,14 +64,18 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
                         {/* <div className="bg-indigo-600 p-1.5 rounded-lg shadow-indigo-200 shadow-lg">
                             <RiGeminiFill className="text-white text-xl" />
                         </div> */}
-                        <h2 className="text-xl font-bold text-black tracking-normal">A.I. Summary</h2>
+                        <h2 id="ai-summary-title" className="text-xl font-bold text-black tracking-normal">A.I. Summary</h2>
                     </div>
                 </div>
 
                 <div className="border-t border-slate-200 flex-1 overflow-y-auto p-6">
                     {isLoading ? (
-                        <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-                            <div className="ai-loader mb-6" />
+                        <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-16">
+                            <div aria-hidden="true" className="relative mb-6 flex h-20 w-20 items-center justify-center">
+                                <span className="absolute inset-0 rounded-full border-4 border-indigo-100 border-t-indigo-600 motion-safe:animate-spin" />
+                                <span className="absolute inset-3 rounded-full bg-indigo-50 motion-safe:animate-pulse" />
+                                <RiGeminiFill className="relative text-3xl text-indigo-600" />
+                            </div>
                             <p className="text-black font-medium tracking-wide">
                                 Analyzing team performance...
                             </p>
@@ -85,8 +86,9 @@ export default function SummaryModal({ open, isLoading, summary, onClose }) {
                             {displayedSummary && (
                                 <div
                                     className="prose prose-slate max-w-none text-slate-700 bg-indigo-50/30 rounded-xl p-5 border border-indigo-100/50 leading-relaxed animate-fade-in"
-                                    dangerouslySetInnerHTML={{ __html: marked(displayedSummary) }}
-                                />
+                                >
+                                    <ReactMarkdown skipHtml disallowedElements={["img"]}>{displayedSummary}</ReactMarkdown>
+                                </div>
                             )}
 
                             {!isLoading && summary && !isTyping && (

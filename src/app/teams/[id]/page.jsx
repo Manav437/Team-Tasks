@@ -6,9 +6,11 @@ import { notFound } from "next/navigation";
 import { IoIosAdd } from "react-icons/io";
 import { MdSearch, MdEdit, MdDelete } from "react-icons/md";
 import { HiChevronLeft, HiChevronDown, HiChevronUp } from "react-icons/hi";
-import { RiTaskLine, RiCloseLine } from "react-icons/ri";
+import { RiTaskLine, RiCloseLine, RiCalendarLine } from "react-icons/ri";
 import { Sidebar } from "../../../components/Sidebar";
 import { SkeletonBoard } from "../../../components/loading-state";
+
+import { formatDueDate, isTaskOverdue } from "@/utils/due-date.mjs";
 
 const STAGES = ["Not Started", "In Progress", "Completed"];
 
@@ -71,6 +73,7 @@ export default function TeamPage({ params }) {
     const [title, setTitle] = useState("");
     const [status, setStatus] = useState(STAGES[0]);
     const [description, setDescription] = useState("");
+    const [dueDate, setDueDate] = useState("");
 
     // Edit Task Modal State
     const [showEditForm, setShowEditForm] = useState(false);
@@ -78,6 +81,7 @@ export default function TeamPage({ params }) {
     const [editTitle, setEditTitle] = useState("");
     const [editStatus, setEditStatus] = useState(STAGES[0]);
     const [editDescription, setEditDescription] = useState("");
+    const [editDueDate, setEditDueDate] = useState("");
 
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
@@ -118,7 +122,7 @@ export default function TeamPage({ params }) {
             const res = await fetch(`/api/teams/${id}/tasks`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, status, description }),
+                body: JSON.stringify({ title, status, description, dueDate: dueDate || null }),
             });
             if (!res.ok) throw new Error("Failed to add task");
             const newTask = await res.json();
@@ -130,6 +134,7 @@ export default function TeamPage({ params }) {
             setTitle("");
             setStatus(STAGES[0]);
             setDescription("");
+            setDueDate("");
             setShowAddForm(false);
         } catch (err) {
             alert("Failed to add task");
@@ -143,6 +148,7 @@ export default function TeamPage({ params }) {
         setEditTitle(task.title);
         setEditStatus(task.status);
         setEditDescription(task.description || "");
+        setEditDueDate(task.dueDate?.slice(0, 10) || "");
         setShowEditForm(true);
     }
 
@@ -163,6 +169,7 @@ export default function TeamPage({ params }) {
                     title: editTitle,
                     status: editStatus,
                     description: editDescription,
+                    dueDate: editDueDate || null,
                 }),
             });
             if (!res.ok) throw new Error("Failed to update task");
@@ -178,6 +185,7 @@ export default function TeamPage({ params }) {
             setEditTitle("");
             setEditStatus(STAGES[0]);
             setEditDescription("");
+            setEditDueDate("");
         } catch (err) {
             alert("Failed to edit task");
         }
@@ -206,6 +214,7 @@ export default function TeamPage({ params }) {
             setEditTitle("");
             setEditStatus(STAGES[0]);
             setEditDescription("");
+            setEditDueDate("");
         } catch (err) {
             alert("Failed to delete task");
         }
@@ -412,6 +421,13 @@ export default function TeamPage({ params }) {
                                                                         </h3>
                                                                         <MdEdit className="text-slate-400 group-hover:text-blue-600 transition-colors text-base shrink-0" />
                                                                     </div>
+                                                                    {task.dueDate && (
+                                                                        <div className={`mt-3 flex flex-wrap items-center gap-1.5 text-xs ${isTaskOverdue(task) ? "text-red-600" : "text-slate-500"}`}>
+                                                                            <RiCalendarLine aria-hidden="true" className="shrink-0" size={14} />
+                                                                            <time dateTime={task.dueDate.slice(0, 10)}>Due {formatDueDate(task.dueDate)}</time>
+                                                                            {isTaskOverdue(task) && <span className="rounded bg-red-50 px-1.5 py-0.5 font-medium">Overdue</span>}
+                                                                        </div>
+                                                                    )}
                                                                     {task.description && (
                                                                         <p className="text-slate-500 text-sm break-words line-clamp-3 leading-relaxed mt-2">
                                                                             {task.description}
@@ -449,6 +465,10 @@ export default function TeamPage({ params }) {
                                     <Select inputId="task-status" className="text-sm" options={options} value={getOptionByValue(status)} onChange={opt => setStatus(opt.value)} menuPortalTarget={typeof document !== 'undefined' ? document.body : null} styles={{ control: (base) => ({ ...base, borderRadius: '0.5rem', borderColor: '#e2e8f0', backgroundColor: '#ffffff' }), menuPortal: base => ({ ...base, zIndex: 9999 }) }} />
                                 </div>
                                 <div className="flex flex-col gap-1.5">
+                                    <label htmlFor="task-due-date" className="text-sm font-medium text-slate-600">Due date <span className="font-normal text-slate-400">(optional)</span></label>
+                                    <input id="task-due-date" type="date" className="min-w-0 w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
                                     <label htmlFor="task-description" className="text-sm font-medium text-slate-600">Description</label>
                                     <textarea id="task-description" className="min-w-0 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors min-h-[100px] resize-none" placeholder="Describe the task..." value={description} onChange={e => setDescription(e.target.value)} required />
                                 </div>
@@ -476,6 +496,10 @@ export default function TeamPage({ params }) {
                                 <div className="flex flex-col gap-1.5">
                                     <label htmlFor="edit-task-status" className="text-sm font-medium text-slate-600">Status</label>
                                     <Select inputId="edit-task-status" className="text-sm" options={options} value={getOptionByValue(editStatus)} onChange={opt => setEditStatus(opt.value)} menuPortalTarget={typeof document !== 'undefined' ? document.body : null} styles={{ control: (base) => ({ ...base, borderRadius: '0.5rem', borderColor: '#e2e8f0', backgroundColor: '#ffffff' }), menuPortal: base => ({ ...base, zIndex: 9999 }) }} />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label htmlFor="edit-task-due-date" className="text-sm font-medium text-slate-600">Due date <span className="font-normal text-slate-400">(optional)</span></label>
+                                    <input id="edit-task-due-date" type="date" className="min-w-0 w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} />
                                 </div>
                                 <div className="flex flex-col gap-1.5">
                                     <label htmlFor="edit-task-description" className="text-sm font-medium text-slate-600">Description</label>

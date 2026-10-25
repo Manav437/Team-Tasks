@@ -75,14 +75,14 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-black bg-[url('/background-auth.jpg')] bg-cover bg-center bg-no-repeat relative">
-            <button
-                onClick={() => router.back()}
+            <Link
+                href="/"
                 className="cursor-pointer text-white text-sm px-2 py-2 absolute top-6 left-6 group flex items-center justify-center gap-2 rounded-md hover:bg-white/20 transition-all duration-300 active:scale-90"
                 aria-label="Go back"
             >
                 <MdArrowBackIosNew />
                 <span>Back</span>
-            </button>
+            </Link>
 
             <div className="relative z-10 w-24/25 max-w-sm mx-auto">
                 <div className="backdrop-blur-md shadow-2xl">
