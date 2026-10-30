@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+@import "./theme.css";
+
+@theme inline {
+    --color-canvas: var(--app-bg);
+    --color-panel: var(--app-panel);
+    --color-raised: var(--app-raised);
+    --color-ink: var(--app-text);
+    --color-muted: var(--app-muted);
+    --color-subtle: var(--app-subtle);
+    --color-line: var(--app-border);
+    --color-accent: var(--app-accent);
+    --color-info: var(--app-info);
+    --color-progress: var(--app-progress);
+    --color-success: var(--app-success);
+    --color-danger: var(--app-danger);
+    --color-danger-bg: var(--app-danger-bg);
+    --color-danger-border: var(--app-danger-border);
+    --color-on-accent: var(--app-on-accent);
+}
+
+
 
 body,
 html {
@@ -10,8 +31,8 @@ html {
 }
 
 body {
-    background-color: #f0f4f8;
-    color: #1e293b;
+    background-color: var(--app-bg);
+    color: var(--app-text);
 }
 
 @keyframes float {
@@ -41,13 +62,6 @@ body {
     will-change: transform;
 }
 
-button:active {
-    border: none;
-}
-
-button:focus {
-    outline: 0;
-}
 
 .animate-slider-left {
     animation: slider-left 30s linear infinite;
@@ -235,7 +249,7 @@ button:focus {
     margin-left: 1.5em;
     list-style-type: disc;
     font-size: 1rem;
-    color: #303132;
+    color: var(--app-muted);
     padding-left: 0em;
 }
 
@@ -243,7 +257,7 @@ button:focus {
     margin-left: 1em;
     list-style-type: "- ";
     font-size: 0.95rem;
-    color: #303132;
+    color: var(--app-muted);
 }
 
 .prose li {
@@ -251,10 +265,16 @@ button:focus {
 }
 
 .prose strong {
-    color: #1c6d93;
+    color: var(--app-text);
 }
 
-button:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
+button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-blob, .animate-slider-left, .animate-shimmer, .ai-shimmer {
+        animation: none;
+    }
 }

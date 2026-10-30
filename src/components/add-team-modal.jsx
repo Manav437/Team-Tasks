@@ -1,11 +1,12 @@
 import Select from "react-select";
+import { selectTheme, selectOptionStyles } from "@/utils/select-theme";
 import { useEffect } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { RiCloseLine } from "react-icons/ri";
 
 const statusDotColors = {
     "Not Started": "bg-slate-400",
-    "In Progress": "bg-blue-500",
+    "In Progress": "bg-progress",
     Completed: "bg-emerald-500",
 };
 
@@ -47,16 +48,16 @@ export const AddTeamModal = ({
             role="dialog"
             aria-modal="true"
             aria-labelledby="create-team-title">
-            <div className="bg-white rounded-xl shadow-xl flex flex-col w-full max-w-md max-h-[90dvh] overflow-y-auto relative">
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="bg-panel rounded-md shadow-xl flex flex-col w-full max-w-md max-h-[90dvh] overflow-y-auto relative">
+                <div className="px-6 py-4 border-b border-line flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <h2 id="create-team-title" className="text-base font-semibold text-slate-800">
+                        <h2 id="create-team-title" className="text-base font-semibold text-ink">
                             Create team
                         </h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                        className="p-1.5 rounded-md text-subtle hover:text-muted hover:bg-raised transition-all cursor-pointer"
                         title="Close"
                     >
                         <RiCloseLine size={20} />
@@ -66,13 +67,13 @@ export const AddTeamModal = ({
                 <form onSubmit={onSubmit} className="flex flex-col">
                     <div className="p-6 flex flex-col gap-5">
                         <div className="flex flex-col gap-1.5">
-                            <label htmlFor="team-name" className="text-sm font-medium text-slate-600">
+                            <label htmlFor="team-name" className="text-sm font-medium text-muted">
                                 Team name
                             </label>
                             <input
                                 id="team-name"
                                 ref={teamNameInputRef}
-                                className="px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors placeholder:text-slate-400"
+                                className="px-3 py-2.5 bg-panel border border-line rounded-md text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors placeholder:text-subtle"
                                 placeholder="Engineering, Design, Marketing..."
                                 value={teamName}
                                 onChange={(e) => setTeamName(e.target.value)}
@@ -81,11 +82,11 @@ export const AddTeamModal = ({
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label htmlFor="initial-task-title" className="text-sm font-medium text-slate-600">
-                                First task <span className="text-slate-400 font-normal">(optional)</span>
+                            <label htmlFor="initial-task-title" className="text-sm font-medium text-muted">
+                                First task <span className="text-subtle font-normal">(optional)</span>
                             </label>
                             <input
-                                className="px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors placeholder:text-slate-400"
+                                className="px-3 py-2.5 bg-panel border border-line rounded-md text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors placeholder:text-subtle"
                                 id="initial-task-title"
                                 placeholder="e.g., Set up project repository"
                                 value={initialTaskTitle}
@@ -94,10 +95,11 @@ export const AddTeamModal = ({
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label htmlFor="initial-task-stage" className="text-sm font-medium text-slate-600">
+                            <label htmlFor="initial-task-stage" className="text-sm font-medium text-muted">
                                 Task status
                             </label>
                             <Select
+                                theme={selectTheme}
                                 inputId="initial-task-stage"
                                 instanceId="initial-task-stage"
                                 options={STAGES}
@@ -114,15 +116,15 @@ export const AddTeamModal = ({
                                 className="text-sm"
                                 classNamePrefix="react-select"
                                 menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-                                styles={{
+                                styles={{ option: selectOptionStyles,
                                     control: (base) => ({
                                         ...base,
                                         borderRadius: '0.5rem',
-                                        borderColor: '#e2e8f0',
-                                        backgroundColor: '#ffffff',
+                                        borderColor: 'var(--app-border)',
+                                        backgroundColor: 'var(--app-panel)',
                                         padding: '2px',
                                         boxShadow: 'none',
-                                        '&:hover': { borderColor: '#2563eb' }
+                                        '&:hover': { borderColor: 'var(--app-focus)' }
                                     }),
                                     menuPortal: (base) => ({ ...base, zIndex: 9999 })
                                 }}
@@ -130,17 +132,17 @@ export const AddTeamModal = ({
                         </div>
                     </div>
 
-                    <div className="px-6 py-4 border-t border-slate-100 flex gap-3 justify-end">
+                    <div className="px-6 py-4 border-t border-line flex gap-3 justify-end">
                         <button
                             type="button"
-                            className="cursor-pointer px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors text-sm focus-visible:ring-2 focus-visible:ring-blue-300"
+                            className="cursor-pointer px-4 py-2 rounded-md bg-panel border border-line text-muted font-medium hover:bg-raised transition-colors text-sm focus-visible:ring-2 focus-visible:ring-blue-300"
                             onClick={onClose}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="cursor-pointer px-3.5 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors text-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-blue-300"
+                            className="cursor-pointer px-3.5 py-2.5 rounded-md bg-accent text-on-accent font-medium hover:bg-accent/90 transition-colors text-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-blue-300"
                         >
                             <IoIosAdd size={22} />
                             Create Team

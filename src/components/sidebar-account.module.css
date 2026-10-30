@@ -1,0 +1,7 @@
+.account { flex-shrink: 0; margin: 0 12px; padding: 16px 0; border-top: 1px solid var(--app-border); }
+.label { margin: 0 0 9px 3px; font-family: var(--font-jetbrains-mono), monospace; font-size: 9px; letter-spacing: .6px; text-transform: uppercase; color: var(--app-subtle); }
+.profile { display: flex; min-width: 0; align-items: center; gap: 10px; padding: 12px 10px; border: 1px solid var(--app-border); border-radius: 5px; background: var(--app-bg); }
+.signOut { display: flex; width: 100%; min-height: 37px; align-items: center; justify-content: center; gap: 8px; margin-top: 9px; padding: 8px 12px; border: 1px solid var(--app-border); border-radius: 5px; color: var(--app-muted); background: transparent; font-size: 12px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.signOut:hover { background: var(--app-danger-bg); border-color: var(--app-danger-border); color: var(--app-danger); }
+.signOut:focus-visible { outline: 2px solid var(--app-focus); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .signOut { transition: none; } }

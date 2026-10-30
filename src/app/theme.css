@@ -1,0 +1,60 @@
+:root {
+    color-scheme: light;
+    --app-bg: #f7f7f5;
+    --app-panel: #ffffff;
+    --app-raised: #ededeb;
+    --app-field: #ffffff;
+    --app-text: #252525;
+    --app-muted: #626262;
+    --app-subtle: #727272;
+    --app-border: #d9d9d5;
+    --app-accent: #252525;
+    --app-accent-hover: #404040;
+    --app-on-accent: #ffffff;
+    --app-focus: #6b6b6b;
+    --app-nav: #f7f7f5f2;
+    --app-shadow: #0000000a;
+    --app-info: #2563eb;
+    --app-progress: #0369a1;
+    --app-success: #047857;
+    --app-danger: #b91c1c;
+    --app-danger-bg: #fef2f2;
+    --app-danger-border: #fecaca;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --app-bg: #161718;
+    --app-panel: #1e2021;
+    --app-raised: #2a2c2e;
+    --app-field: #191a1b;
+    --app-text: #dedede;
+    --app-muted: #b0b0b0;
+    --app-subtle: #999999;
+    --app-border: #3b3d3f;
+    --app-accent: #d4d4d4;
+    --app-accent-hover: #e5e5e5;
+    --app-on-accent: #202020;
+    --app-focus: #aaaaaa;
+    --app-nav: #161718f2;
+    --app-shadow: #00000025;
+    --app-info: #93b4ed;
+    --app-progress: #38bdf8;
+    --app-success: #82c9af;
+    --app-danger: #f0a5a5;
+    --app-danger-bg: #38282a;
+    --app-danger-border: #694447;
+}
+
+/* A gentler charcoal canvas keeps long dashboard sessions comfortable. */
+:root[data-theme="dark"] .dashboard-theme {
+    --app-bg: #222426;
+    --app-panel: #292b2d;
+    --app-raised: #333638;
+    --app-field: #252729;
+    --app-text: #d8dadb;
+    --app-muted: #b5b8ba;
+    --app-subtle: #a2a6a8;
+    --app-border: #444749;
+    --app-accent: #ced1d2;
+}

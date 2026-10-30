@@ -1,0 +1,30 @@
+.modal { margin: auto; padding: 0; width: calc(100% - 32px); max-width: 560px; max-height: 85dvh; border: 1px solid var(--app-border); border-radius: 4px; background: var(--app-panel); color: var(--app-text); box-shadow: 0 24px 80px #0003; }
+.modal::backdrop { background: #0007; }
+.content { display: flex; flex-direction: column; max-height: 85dvh; }
+.header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--app-border); }
+.header p { margin-bottom: 7px; font-family: var(--font-jetbrains-mono), monospace; color: var(--app-subtle); font-size: 9px; letter-spacing: 1px; }
+.header h2 { font-size: 19px; font-weight: 500; letter-spacing: -.4px; }
+.iconButton { display: grid; width: 36px; height: 36px; place-items: center; color: var(--app-muted); cursor: pointer; }
+.iconButton:hover, .copyButton:hover { background: var(--app-raised); }
+.body { min-height: 180px; min-width: 0; overflow-y: auto; padding: 24px; }
+.loading { display: flex; min-height: 170px; align-items: center; justify-content: center; gap: 12px; color: var(--app-muted); font-size: 13px; }
+.spinner { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid var(--app-border); border-top-color: var(--app-muted); border-radius: 50%; animation: spin .9s linear infinite; }
+.markdown { font-size: 13px; line-height: 1.85; overflow-wrap: anywhere; color: var(--app-muted); }
+.markdown h1, .markdown h2, .markdown h3 { margin: 0 0 14px; color: var(--app-text); font-size: 16px; font-weight: 500; }
+.markdown p, .markdown ul, .markdown ol { margin-bottom: 14px; }
+.markdown ul { list-style-type: disc; padding-left: 20px; }
+.markdown ol { list-style-type: decimal; padding-left: 20px; }
+.markdown li + li { margin-top: 7px; }
+.markdown strong { font-weight: 600; color: var(--app-text); }
+.markdown a { color: var(--app-info); text-decoration: underline; }
+.markdown pre { padding: 12px; overflow: auto; background: var(--app-bg); }
+.footer { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 24px; border-top: 1px solid var(--app-border); }
+.footer > span { font-size: 10px; color: var(--app-subtle); }
+.footer > div { display: flex; gap: 8px; }
+.copyButton, .closeButton { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; padding: 7px 12px; font-size: 11px; cursor: pointer; }
+.copyButton { color: var(--app-muted); }
+.closeButton { border: 1px solid var(--app-border); color: var(--app-text); }
+.closeButton:hover { background: var(--app-raised); }
+.modal button:focus-visible { outline: 2px solid var(--app-focus); outline-offset: 3px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

@@ -1,0 +1,369 @@
+.page {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    min-height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    padding: 88px 24px 48px;
+    background: var(--app-bg);
+    color: var(--app-text);
+    color-scheme: inherit;
+}
+
+.background,
+.vignette {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.background {
+    image-rendering: pixelated;
+    opacity: .8;
+}
+
+.vignette {
+    background: radial-gradient(ellipse at center, transparent 15%, #0009 100%);
+}
+
+.back {
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 0;
+    color: var(--app-muted);
+    font-size: 12px;
+    transition: color .2s;
+}
+
+.back:hover {
+    color: var(--app-text);
+}
+
+.panel {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 28px 26px 24px;
+    border: 1px solid var(--app-border);
+    background: var(--app-panel);
+    box-shadow: 0 24px 90px var(--app-shadow);
+}
+
+.corner {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    border-color: var(--app-subtle);
+    border-style: solid;
+    pointer-events: none;
+}
+
+.topLeft {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+}
+
+.topRight {
+    top: -1px;
+    right: -1px;
+    border-width: 2px 2px 0 0;
+}
+
+.bottomLeft {
+    bottom: -1px;
+    left: -1px;
+    border-width: 0 0 2px 2px;
+}
+
+.bottomRight {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+}
+
+.brand {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: -1px;
+}
+
+.brandLogo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.heading {
+    margin: 24px 0 22px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -.4px;
+}
+
+.google,
+.input,
+.submit {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 0;
+    font-size: 14px;
+}
+
+.google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    border: 1px solid var(--app-border);
+    background: var(--app-field);
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+}
+
+.google:hover {
+    background: var(--app-raised);
+    border-color: var(--app-focus);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    margin: 20px 0;
+    color: var(--app-subtle);
+    font-size: 12px;
+}
+
+.divider span {
+    height: 1px;
+    flex: 1;
+    background: var(--app-border);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.input {
+    display: block;
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid var(--app-border);
+    background: var(--app-field);
+    color: var(--app-text);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.input::placeholder {
+    color: var(--app-subtle);
+}
+
+.input:focus {
+    border-color: var(--app-focus);
+    box-shadow: 0 0 0 2px #ffffff12;
+}
+
+.password {
+    position: relative;
+}
+
+.password .input {
+    padding-right: 52px;
+}
+
+.eye {
+    position: absolute;
+    top: 0;
+    right: 3px;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    color: var(--app-subtle);
+    cursor: pointer;
+}
+
+.eye:hover {
+    color: var(--app-text);
+}
+
+.forgot {
+    align-self: flex-end;
+    margin: -1px 0 4px;
+    color: var(--app-muted);
+    font-size: 12px;
+}
+
+.forgot:hover {
+    color: var(--app-text);
+}
+
+.submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 5px;
+    border: 1px solid var(--app-accent);
+    background: var(--app-accent);
+    color: var(--app-on-accent);
+    cursor: pointer;
+    font-family: var(--font-jetbrains-mono), monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background .2s;
+}
+
+.submit:hover {
+    background: var(--app-accent-hover);
+}
+
+.submit:disabled,
+.google:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+.error {
+    margin: 0;
+    border: 1px solid var(--app-danger-border);
+    padding: 10px 12px;
+    color: var(--app-danger);
+    background: var(--app-danger-bg);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.switchAccount {
+    margin: 20px 0 0;
+    text-align: center;
+    color: var(--app-muted);
+    font-size: 13px;
+}
+
+.switchAccount a {
+    color: var(--app-text);
+    font-weight: 500;
+}
+
+.switchAccount a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.footer {
+    margin: 31px 0 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--app-subtle);
+}
+
+.page a:focus-visible,
+.page button:focus-visible {
+    outline: 2px solid var(--app-focus);
+    outline-offset: 4px;
+}
+
+.spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #1114;
+    border-top-color: var(--app-on-accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        padding: 76px 18px 28px;
+    }
+
+    .back {
+        top: 18px;
+        left: 20px;
+    }
+
+    .panel {
+        padding: 26px 22px 22px;
+    }
+
+    .input {
+        font-size: 16px;
+    }
+
+    .brand {
+        font-size: 24px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .page *,
+    .page *::before,
+    .page *::after {
+        animation: none;
+        transition: none;
+    }
+}
+
+.themeControl {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+}
+
+:global([data-theme="light"]) .background {
+    filter: invert(1);
+    opacity: .45;
+}
+
+:global([data-theme="light"]) .vignette {
+    background: radial-gradient(ellipse at center, transparent 15%, #ffffff88 100%);
+}
+
+@media (max-width: 480px) {
+    .themeControl {
+        top: 16px;
+        right: 18px;
+    }
+}

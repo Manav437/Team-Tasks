@@ -8,7 +8,7 @@ export default function NotFound() {
     const router = useRouter();
     return (
         <main className="min-h-screen flex flex-col items-center justify-center bg-[url('/landing-page-bg.png')] px-4">
-            <section className="bg-white/40 rounded-lg shadow-lg p-8 max-w-sm w-full flex flex-col gap-4 items-start">
+            <section className="bg-panel/40 rounded-lg shadow-lg p-8 max-w-sm w-full flex flex-col gap-4 items-start">
                 <div className="flex items-start justify-between gap-3 mb-2 w-full">
                     <Image
                         className="cursor-pointer"
@@ -30,10 +30,10 @@ export default function NotFound() {
                         </h2>
                     </div>
                 </div>
-                <p className="text-slate-600 mb-2 text-start rounded-md text-[15px]">
+                <p className="text-muted mb-2 text-start rounded-md text-[15px]">
                     This page took a wrong turn at{" "}
                     <a
-                        className="text-slate-400 italic hover:text-slate-500 underline"
+                        className="text-subtle italic hover:text-muted underline"
                         target="_blank"
                         rel="noopener noreferrer"
                         href="https://en.wikipedia.org/wiki/Breaking_Bad"
@@ -45,7 +45,7 @@ export default function NotFound() {
                 </p>
                 <Link
                     href="/"
-                    className="group flex items-center mx-auto justify-between gap-2 transition-all duration-300 bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:bg-slate-800 active:scale-95"
+                    className="group flex items-center mx-auto justify-between gap-2 transition-all duration-300 bg-accent text-on-accent px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:bg-accent/90 active:scale-95"
                 >
                     Go back Home
                     <PiArrowRight className="transition-transform group-hover:translate-x-[1.5px]" size={15} />

@@ -5,7 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 import { parseDueDate } from "@/utils/due-date.mjs";
 
-const prisma = new PrismaClient();
+const prisma = global.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;
 
 export async function PUT(request, { params }) {
     const { id: teamId, taskId } = await params;
@@ -19,30 +20,11 @@ export async function PUT(request, { params }) {
         }
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
+            select: { id: true },
         });
         if (!user) {
             return NextResponse.json(
                 { error: "User not found" },
-                { status: 404 },
-            );
-        }
-
-        const team = await prisma.team.findFirst({
-            where: { id: teamId, userId: user.id },
-        });
-        if (!team) {
-            return NextResponse.json(
-                { error: "Team not found or not owned by user" },
-                { status: 404 },
-            );
-        }
-
-        const task = await prisma.task.findFirst({
-            where: { id: taskId, teamId: teamId },
-        });
-        if (!task) {
-            return NextResponse.json(
-                { error: "Task not found or does not belong to this team" },
                 { status: 404 },
             );
         }
@@ -63,7 +45,8 @@ export async function PUT(request, { params }) {
         }
 
         const updatedTask = await prisma.task.update({
-            where: { id: taskId },
+            // The task id, team id, and ownership are checked in the write itself.
+            where: { id: taskId, teamId, team: { is: { userId: user.id } } },
             data: {
                 title,
                 status,
@@ -74,6 +57,9 @@ export async function PUT(request, { params }) {
 
         return NextResponse.json(updatedTask, { status: 200 });
     } catch (error) {
+        if (error.code === "P2025") {
+            return NextResponse.json({ error: "Task not found or not accessible" }, { status: 404 });
+        }
         console.error(error);
         return NextResponse.json(
             { error: "Failed to update task" },

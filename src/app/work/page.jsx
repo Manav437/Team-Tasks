@@ -1,5 +1,7 @@
 "use client";
-import { Sidebar } from "../../components/Sidebar";
+import { Sidebar } from "@/components/Sidebar";
+import PageHeader from "@/components/dashboard/page-header";
+import styles from "@/components/dashboard/dashboard.module.css";
 
 export default function WorkPage() {
     const stats = [
@@ -8,71 +10,21 @@ export default function WorkPage() {
         { label: "Completion rate", value: "84%" },
         { label: "Urgent flags", value: "2" },
     ];
-
-    return (
-        <div className="flex min-h-screen bg-[#f8fafc]">
-            <Sidebar />
-
-            <main className="min-w-0 flex-1 h-dvh overflow-auto">
-                <div className="w-full px-2 sm:px-4 pt-28 md:pt-10 pb-12">
-                    <header className="mb-6 border-b border-black/30 pb-2">
-                        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Work</h1>
-                        <p className="mt-2 text-sm text-slate-500">
-                            A snapshot of your tasks and project pipeline.
-                        </p>
-                        {/* <p className="mt-2 text-xs text-blue-600">Preview · Sample data</p>*/}
-                    </header>
-
-                    <dl className="grid grid-cols-2 divide-x divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white sm:grid-cols-4">
-                        {stats.map((stat, i) => (
-                            <div
-                                key={stat.label}
-                                className={`px-4 py-4 sm:px-5 ${i > 1 ? "border-t border-slate-200 sm:border-t-0" : ""} ${i === 2 ? "max-sm:border-l-0" : ""}`}
-                            >
-                                <dt className="text-xs text-slate-500">{stat.label}</dt>
-                                <dd className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{stat.value}</dd>
-                            </div>
-                        ))}
-                    </dl>
-
-                    <section aria-labelledby="pipeline-heading" className="mt-6 rounded-xl border border-slate-200 bg-white">
-                        <div className="border-b border-slate-200 px-4 py-4 sm:px-5">
-                            <h2 id="pipeline-heading" className="text-sm font-semibold text-slate-900">Current pipeline</h2>
-                        </div>
-                        <ul className="divide-y divide-slate-200">
-                            {[1, 2, 3].map((phase) => (
-                                <li key={phase} className="flex flex-col gap-1 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5">
-                                    <div className="min-w-0">
-                                        <h3 className="text-sm font-medium text-slate-800">
-                                            Operational System Audit - Phase {phase}
-                                        </h3>
-                                        <p className="mt-1 text-xs text-slate-500">Internal project</p>
-                                    </div>
-                                    <span className="shrink-0 text-xs text-slate-500">Due in {phase + 1} days</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </section>
-
-                    <section aria-labelledby="weekly-progress-heading" className="mt-6 rounded-xl border border-slate-200 bg-white px-4 py-4 sm:px-5">
-                        <div className="flex items-center justify-between gap-4">
-                            <h2 id="weekly-progress-heading" className="text-sm font-semibold text-slate-900">Weekly progress</h2>
-                            <span className="text-sm font-medium tabular-nums text-blue-600">84%</span>
-                        </div>
-                        <div
-                            role="progressbar"
-                            aria-labelledby="weekly-progress-heading"
-                            aria-valuenow={84}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100"
-                        >
-                            <div className="h-full w-[84%] rounded-full bg-blue-600" />
-                        </div>
-                        <p className="mt-3 text-xs text-slate-500">2 more tasks to reach the weekly goal in this sample.</p>
-                    </section>
-                </div>
-            </main>
-        </div>
-    );
+    return <div className="dashboard-theme flex min-h-screen bg-canvas"><Sidebar />
+        <main className={styles.mainFrame}><div className={styles.content}>
+            <PageHeader title="Work" description="The bigger picture, without losing the details." badge="Sample data" />
+            <dl className={styles.stats}>{stats.map(stat => <div key={stat.label} className={styles.stat}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>)}</dl>
+            <div className={styles.workGrid}>
+                <section className={styles.panel} aria-labelledby="pipeline-heading"><div className={styles.panelHeading}><h2 id="pipeline-heading">Current pipeline</h2><span>03 PROJECT PHASES</span></div>
+                    <ul>{[1, 2, 3].map(phase => <li className={styles.pipelineRow} key={phase}><div><h3>Operational System Audit · Phase {phase}</h3><p>Internal project</p></div><span>Due in {phase + 1} days</span></li>)}</ul>
+                </section>
+                <section className={styles.panel} aria-labelledby="weekly-progress-heading"><div className={styles.panelHeading}><h2 id="weekly-progress-heading">Weekly progress</h2><span>THIS WEEK</span></div>
+                    <div className={styles.progressBody}><p className={styles.progressValue}>84<span className="text-xl text-subtle">%</span></p>
+                        <div role="progressbar" aria-labelledby="weekly-progress-heading" aria-valuenow={84} aria-valuemin={0} aria-valuemax={100} className="mt-5 h-1 overflow-hidden bg-raised"><div className="h-full w-[84%] bg-accent" /></div>
+                        <p>2 more tasks to reach the weekly goal in this sample. This overview uses example data.</p>
+                    </div>
+                </section>
+            </div>
+        </div></main>
+    </div>;
 }

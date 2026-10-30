@@ -69,8 +69,8 @@ export const STAGES = [
 export const STATUS_STYLES = {
     "Not Started": { text: "text-gray-700 bg-gray-100", dot: "bg-gray-400" },
     "In Progress": {
-        text: "text-yellow-800 bg-yellow-100",
-        dot: "bg-yellow-400",
+        text: "text-progress bg-raised",
+        dot: "bg-progress",
     },
     Completed: { text: "text-green-800 bg-green-100", dot: "bg-green-500" },
 };

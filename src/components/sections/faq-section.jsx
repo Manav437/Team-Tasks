@@ -1,29 +1,33 @@
 "use client";
 import { useState } from "react";
-import { faqContent } from "@/constants";
-import { FaqItem } from "@/components/ui/faq-item";
+import { PiPlus } from "react-icons/pi";
+import styles from "./landing.module.css";
 
+const questions = [
+    { question: "Who is Team Tasks for?", answer: "Team Tasks is built for managers who want a clear place to maintain tasks under their teams, monitor progress, and keep deadlines visible." },
+    { question: "Do my team members need accounts?", answer: "No. You manage your teams and their task boards from your own account. Your team members do not need to sign up." },
+    { question: "How do I keep track of deadlines?", answer: "Add an optional due date when creating or editing a task. The date appears on its card, and unfinished tasks past their deadline are marked overdue." },
+    { question: "What do AI summaries include?", answer: "AI summaries use your team's task titles and statuses to give you a quick overview of progress and suggest next steps. Review the suggestions before acting on them." },
+];
 export default function FaqSection() {
     const [openIndex, setOpenIndex] = useState(0);
-
-    return (
-        <section className="w-11/12 max-w-2xl mx-auto my-12 mb-18">
-            <h2 className="text-3xl font-bold mb-10 text-center text-slate-900 tracking-tight">
-                Frequently Asked Questions
+    return <section data-reveal="visible" id="faq" className={styles.faq}>
+        <div className={styles.sectionHeading}>
+            {/* <p className={styles.eyebrow}>
+                A FEW THINGS TO KNOW
+            </p>*/}
+            <h2>
+                Good questions.<br /><span>Clear answers.</span>
             </h2>
-
-            <div className="flex flex-col gap-3 min-h-[400px]">
-                {faqContent.map((item, index) => (
-                    <FaqItem
-                        key={index}
-                        item={item}
-                        isOpen={openIndex === index}
-                        onToggle={() =>
-                            setOpenIndex(openIndex === index ? null : index)
-                        }
-                    />
-                ))}
-            </div>
-        </section>
-    );
+        </div>
+        <div className={styles.questions}>{questions.map((item, index) => {
+            const isOpen = openIndex === index;
+            return <div key={item.question} className={styles.question}>
+                <h3><button id={`faq-question-${index}`} type="button" aria-expanded={isOpen} aria-controls={`faq-answer-${index}`} onClick={() => setOpenIndex(isOpen ? null : index)}>{item.question}<PiPlus className={styles.faqToggle} aria-hidden="true" /></button></h3>
+                <div id={`faq-answer-${index}`} className={styles.answer} data-open={isOpen} aria-hidden={!isOpen} inert={!isOpen} role="region" aria-labelledby={`faq-question-${index}`}>
+                    <div className={styles.answerInner}><p>{item.answer}</p></div>
+                </div>
+            </div>;
+        })}</div>
+    </section>;
 }

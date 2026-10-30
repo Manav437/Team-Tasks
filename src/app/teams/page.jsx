@@ -1,9 +1,12 @@
 "use client";
 import Link from "next/link";
+import PageHeader from "@/components/dashboard/page-header";
+import styles from "@/components/dashboard/dashboard.module.css";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { STAGES } from "@/constants";
 import { Sidebar } from "../../components/Sidebar";
 import { buildTeamSummaryPrompt } from "@/utils/prompt";
+import ConfirmModal from "@/components/confirm-modal";
 import SummaryModal from "@/components/summary-modal";
 import { AddTeamModal } from "@/components/add-team-modal";
 import { Pagination } from "../../components/pagination";
@@ -25,6 +28,7 @@ export default function TeamsPage() {
     const [initialTaskStage, setInitialTaskStage] = useState(STAGES[0]);
 
     const [deletingTeamId, setDeletingTeamId] = useState(null);
+    const [teamToDelete, setTeamToDelete] = useState(null);
 
     const [page, setPage] = useState(1);
     const [limit] = useState(9);
@@ -115,11 +119,6 @@ export default function TeamsPage() {
     }
 
     async function handleDeleteTeam(teamId) {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this team?\nThis action cannot be undone.",
-        );
-        if (!confirmed) return;
-
         setDeletingTeamId(teamId);
         try {
             const res = await fetch(`/api/teams/${teamId}`, {
@@ -128,8 +127,8 @@ export default function TeamsPage() {
             if (!res.ok) throw new Error("Failed to delete");
             setTeams((prev) => prev.filter((t) => (t.id || t._id) !== teamId));
             fetchTeams(page, { silent: true });
-        } catch (err) {
-            alert("Failed to delete");
+        } catch {
+            throw new Error("Couldn’t delete this team. Please try again.");
         } finally {
             setDeletingTeamId(null);
         }
@@ -161,61 +160,52 @@ export default function TeamsPage() {
     }
 
     return (
-        <div className="flex min-h-screen bg-[#f8fafc]">
+        <div className="dashboard-theme flex min-h-screen bg-canvas md:h-dvh md:min-h-0 md:overflow-hidden">
             <Sidebar />
 
-            <main className="min-w-0 flex-1 h-dvh overflow-y-auto">
-                <div className="w-full px-2 sm:px-4 pt-28 md:pt-10 pb-12">
-                    <div className="border-b border-black/30 pb-2 mb-6">
-                        <div className="">
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                                <div>
-                                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1.5">
-                                        Teams
-                                    </h1>
-                                    <p className="text-sm text-slate-500">Your teams and their task boards.</p>
-                                </div>
-
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <div className="relative group w-full sm:w-64">
-                                        <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                                            <MdSearch size={20} />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            className="pl-11 pr-10 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-200  outline-none w-full transition-colors"
-                                            placeholder="Search teams…"
-                                            aria-label="Search teams on this page"
-                                            value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                        />
-                                        {search && (
-                                            <button
-                                                onClick={() => setSearch("")}
-                                                className="absolute inset-y-0 right-3.5 flex items-center text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
-                                                title="Clear search"
-                                            >
-                                                <RiCloseLine size={20} />
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    <button
-                                        onClick={() => setShowForm(true)}
-                                        className="cursor-pointer flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors text-sm focus-visible:ring-2 focus-visible:ring-blue-300"
-                                    >
-                                        <IoIosAdd size={24} />
-                                        Create Team
-                                    </button>
-                                </div>
+            <main className={`${styles.mainFrame} ${styles.teamsMain}`}>
+                <div className={`${styles.content} ${styles.teamsContent}`}>
+                    <PageHeader title="Teams" description="Your teams, their tasks, and the bigger picture." actions={<>
+                        <div className="relative group w-full sm:w-64">
+                            <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-subtle transition-colors">
+                                <MdSearch size={20} />
                             </div>
+                            <input
+                                type="text"
+                                className="pl-11 pr-10 py-2.5 bg-panel border border-line rounded-xs text-sm focus:ring focus:ring-blue-100 outline-none w-full transition-colors"
+                                placeholder="Search teams…"
+                                aria-label="Search teams on this page"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                            {search && (
+                                <button
+                                    onClick={() => setSearch("")}
+                                    className="absolute inset-y-0 right-3.5 flex items-center text-subtle hover:text-ink transition-colors cursor-pointer"
+                                    title="Clear search"
+                                >
+                                    <RiCloseLine size={20} />
+                                </button>
+                            )}
                         </div>
+
+                        <button
+                            onClick={() => setShowForm(true)}
+                            className="cursor-pointer flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xs bg-accent text-on-accent font-medium hover:bg-accent/90 transition-colors text-sm focus-visible:ring-2 focus-visible:ring-blue-300"
+                        >
+                            <IoIosAdd size={24} />
+                            Create Team
+                        </button>
+                    </>} />
+                    <div className={styles.directoryBar}>
+                        <span>Team directory</span>
+                        {/* <span>{loading ? "Loading teams…" : `${filteredTeams.length} teams on this page`}</span>*/}
                     </div>
 
-                    <div className="">
+                    <div className={styles.teamsList}>
                         <div className="w-full">
                             {error && (
-                                <p role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+                                <p role="alert" className="mb-5 rounded-md border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger">{error}</p>
                             )}
                             {showForm && (
                                 <AddTeamModal
@@ -244,12 +234,12 @@ export default function TeamsPage() {
                                     {teams.length > 0 && (
                                         <>
                                             {search && filteredTeams.length === 0 ? (
-                                                <div className="flex flex-col items-center justify-center py-16 px-5 bg-white rounded-xl border border-slate-200 text-center">
-                                                    <MdSearch className="mb-3 text-slate-400 text-2xl" />
-                                                    <h3 className="text-base font-medium text-slate-800 break-all">No teams found for &ldquo;{search}&rdquo;</h3>
+                                                <div className="flex flex-col items-center justify-center py-16 px-5 bg-panel rounded-md border border-line text-center">
+                                                    <MdSearch className="mb-3 text-subtle text-2xl" />
+                                                    <h3 className="text-base font-medium text-ink break-all">No teams found for &ldquo;{search}&rdquo;</h3>
                                                     <button
                                                         onClick={() => setSearch("")}
-                                                        className="mt-3 text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                                        className="mt-3 text-sm font-medium text-info hover:underline cursor-pointer"
                                                     >
                                                         Clear search filter
                                                     </button>
@@ -263,12 +253,13 @@ export default function TeamsPage() {
                                                         return (
                                                             <div
                                                                 key={team.id || team._id}
-                                                                className="group min-w-0 bg-white border border-slate-200 rounded-xl p-5 flex flex-col"
+                                                                className={styles.teamCard}
                                                             >
                                                                 <div className="flex justify-between items-start gap-3 mb-5">
-                                                                    <h2 className="min-w-0 pt-1 text-base font-semibold text-slate-800 break-words">
-                                                                        <Link href={`/teams/${team.id || team._id}`} className="hover:text-blue-600 transition-colors">{team.name}</Link>
-                                                                    </h2>
+                                                                    <div className="min-w-0"><p className={styles.teamLabel}>{totalTasks} {totalTasks === 1 ? "task" : "tasks"}</p>
+                                                                        <h2 className="min-w-0 text-ink break-words">
+                                                                            <Link href={`/teams/${team.id || team._id}`} className="hover:text-ink transition-colors">{team.name}</Link>
+                                                                        </h2></div>
                                                                     <div className="flex shrink-0 items-center gap-1">
                                                                         <button
                                                                             onClick={(e) => {
@@ -276,7 +267,7 @@ export default function TeamsPage() {
                                                                                 handleAISummary(team);
                                                                             }}
                                                                             disabled={isSummarizing}
-                                                                            className="p-2 rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
+                                                                            className="p-2 rounded-md text-subtle hover:bg-raised hover:text-ink transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
                                                                             title="AI Summary"
                                                                             aria-label={`Summarize ${team.name}`}
                                                                         >
@@ -287,9 +278,9 @@ export default function TeamsPage() {
                                                                             )}
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleDeleteTeam(team.id || team._id)}
+                                                                            onClick={() => setTeamToDelete(team)}
                                                                             disabled={deletingTeamId === (team.id || team._id)}
-                                                                            className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
+                                                                            className="p-2 rounded-md text-subtle hover:bg-danger-bg hover:text-danger transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
                                                                             title="Delete Team"
                                                                             aria-label={`Delete ${team.name}`}
                                                                         >
@@ -300,13 +291,13 @@ export default function TeamsPage() {
 
                                                                 <div className="flex-1 mb-5">
                                                                     <div className="flex flex-col gap-2.5">
-                                                                        <div className="flex justify-between gap-2 text-xs text-slate-500">
+                                                                        <div className={`flex justify-between gap-2 text-muted ${styles.progressLabel}`}>
                                                                             <span>{completedTasks} of {totalTasks} tasks complete</span>
                                                                             <span>{totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}%</span>
                                                                         </div>
-                                                                        <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                                                        <div className="w-full h-1 bg-raised overflow-hidden">
                                                                             <div
-                                                                                className="h-full bg-blue-500 rounded-full"
+                                                                                className="h-full bg-accent"
                                                                                 style={{ width: `${totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0}%` }}
                                                                             />
                                                                         </div>
@@ -315,7 +306,7 @@ export default function TeamsPage() {
 
                                                                 <Link
                                                                     href={`/teams/${team.id || team._id}`}
-                                                                    className="flex items-center justify-between border-t border-slate-100 pt-4 text-slate-500 hover:text-blue-600 transition-colors mt-auto"
+                                                                    className="flex items-center justify-between border-t border-line pt-4 text-muted hover:text-ink transition-colors mt-auto"
                                                                 >
                                                                     <div className="flex items-center gap-3">
                                                                         <span className="text-sm font-medium">Open board</span>
@@ -328,19 +319,29 @@ export default function TeamsPage() {
                                                 </div>
                                             )}
 
-                                            <div className="mt-8 flex justify-center">
-                                                <Pagination
-                                                    page={page}
-                                                    setPage={setPage}
-                                                    totalPages={totalPages}
-                                                />
-                                            </div>
                                         </>
                                     )}
                                 </>
                             )}
                         </div>
                     </div>
+
+                    {!loading && teams.length > 0 && (
+                        <div className={styles.teamsPagination}>
+                            <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+                        </div>
+                    )}
+
+                    <ConfirmModal
+                        open={Boolean(teamToDelete)}
+                        title="Delete team?"
+                        description={`This will remove “${teamToDelete?.name || "this team"}” from your workspace. This action cannot be undone.`}
+                        confirmLabel="Delete team"
+                        pendingLabel="Deleting…"
+                        destructive
+                        onConfirm={() => handleDeleteTeam(teamToDelete.id || teamToDelete._id)}
+                        onClose={() => setTeamToDelete(null)}
+                    />
 
                     <SummaryModal
                         open={summaryModalOpen}
