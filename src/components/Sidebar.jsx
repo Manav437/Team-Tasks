@@ -6,7 +6,6 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { RiCloseLine, RiGroupLine, RiLogoutBoxRLine, RiMenuLine, RiSettings3Line, RiBriefcase4Line } from "react-icons/ri";
-
 import ConfirmModal from "./confirm-modal";
 import ThemeSwitch from "./theme-switch";
 import styles from "./sidebar-account.module.css";
@@ -121,7 +120,7 @@ export function Sidebar() {
     return (
         <>
             <aside className="sticky top-0 hidden h-dvh w-56 shrink-0 self-start flex-col overflow-y-auto border-r border-line bg-panel md:flex">
-                <div className="px-6 pt-8 pb-2">
+                <div className="px-6 py-4 pt-6">
                     <Brand />
                 </div>
                 <Navigation pathname={pathname} />
@@ -156,7 +155,7 @@ export function Sidebar() {
             >
                 <div className="flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-line bg-panel">
                     <div className="flex items-center justify-between gap-3 px-5 pt-6 pb-2">
-                        <Brand onClick={closeSidebar} />
+                        {/* <Brand onClick={closeSidebar} />*/}
                         <button
                             type="button"
                             aria-label="Close navigation"

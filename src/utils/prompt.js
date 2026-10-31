@@ -1,7 +1,15 @@
 export function buildTeamSummaryPrompt(team) {
     const taskList =
         team.tasks.length > 0
-            ? team.tasks.map((t) => `- ${t.title}: ${t.status}`).join("\n")
+            ? team.tasks
+                  .map((t) => {
+                      const due = t.dueDate
+                          ? `, due ${new Date(t.dueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
+                          : "";
+                      const desc = t.description ? ` — ${t.description}` : "";
+                      return `- ${t.title}: ${t.status}${due}${desc}`;
+                  })
+                  .join("\n")
             : "No tasks assigned.";
 
     return `You are a project management assistant.

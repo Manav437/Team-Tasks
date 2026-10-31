@@ -22,6 +22,7 @@ export const AddTeamModal = ({
     setInitialTaskStage,
     STAGES,
     teamNameInputRef,
+    error,
 }) => {
     useEffect(() => {
         if (show && teamNameInputRef?.current) {
@@ -73,7 +74,7 @@ export const AddTeamModal = ({
                             <input
                                 id="team-name"
                                 ref={teamNameInputRef}
-                                className="px-3 py-2.5 bg-panel border border-line rounded-md text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors placeholder:text-subtle"
+                                className="px-3 py-2.5 bg-panel border border-line rounded-md text-sm focus:ring focus:ring-blue-100 outline-none transition-colors placeholder:text-subtle"
                                 placeholder="Engineering, Design, Marketing..."
                                 value={teamName}
                                 onChange={(e) => setTeamName(e.target.value)}
@@ -86,7 +87,7 @@ export const AddTeamModal = ({
                                 First task <span className="text-subtle font-normal">(optional)</span>
                             </label>
                             <input
-                                className="px-3 py-2.5 bg-panel border border-line rounded-md text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors placeholder:text-subtle"
+                                className="px-3 py-2.5 bg-panel border border-line rounded-md text-sm focus:ring focus:ring-blue-100 outline-none transition-colors placeholder:text-subtle"
                                 id="initial-task-title"
                                 placeholder="e.g., Set up project repository"
                                 value={initialTaskTitle}
@@ -116,7 +117,8 @@ export const AddTeamModal = ({
                                 className="text-sm"
                                 classNamePrefix="react-select"
                                 menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-                                styles={{ option: selectOptionStyles,
+                                styles={{
+                                    option: selectOptionStyles,
                                     control: (base) => ({
                                         ...base,
                                         borderRadius: '0.5rem',
@@ -133,6 +135,11 @@ export const AddTeamModal = ({
                     </div>
 
                     <div className="px-6 py-4 border-t border-line flex gap-3 justify-end">
+                        {error && (
+                            <p role="alert" className="flex-1 self-center rounded-md border border-danger-border bg-danger-bg px-3 py-2 text-xs text-danger">
+                                {error}
+                            </p>
+                        )}
                         <button
                             type="button"
                             className="cursor-pointer px-4 py-2 rounded-md bg-panel border border-line text-muted font-medium hover:bg-raised transition-colors text-sm focus-visible:ring-2 focus-visible:ring-blue-300"

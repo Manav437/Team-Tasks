@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
-const prisma = new PrismaClient();
 
 export async function GET(request, { params }) {
     const { id } = await params;
@@ -80,9 +78,9 @@ export async function DELETE(request, { params }) {
             );
         }
 
-        await prisma.team.delete({
-            where: { id },
-        });
+        // Delete all tasks belonging to this team first (cascade)
+        await prisma.task.deleteMany({ where: { teamId: id } });
+        await prisma.team.delete({ where: { id } });
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {

@@ -90,6 +90,8 @@ export default function TeamPage({ params }) {
     const [taskSaveError, setTaskSaveError] = useState("");
     const savingTaskRef = useRef(false);
 
+    const [addTaskError, setAddTaskError] = useState("");
+
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
 
@@ -125,6 +127,7 @@ export default function TeamPage({ params }) {
     async function handleAddTask(e) {
         e.preventDefault();
         if (!title.trim()) return;
+        setAddTaskError("");
         try {
             const res = await fetch(`/api/teams/${id}/tasks`, {
                 method: "POST",
@@ -144,7 +147,7 @@ export default function TeamPage({ params }) {
             setDueDate("");
             setShowAddForm(false);
         } catch (err) {
-            alert("Failed to add task");
+            setAddTaskError("Couldn't create task. Please try again.");
         }
     }
 
@@ -217,8 +220,9 @@ export default function TeamPage({ params }) {
             if (!res.ok) throw new Error("Failed to delete task");
             setTeam((prev) => {
                 if (!prev) return prev;
-                const updatedTasks = [...prev.tasks];
-                updatedTasks.splice(editIdx, 1);
+                const updatedTasks = prev.tasks.filter(
+                    (t) => (t.id || t._id) !== taskId,
+                );
                 return { ...prev, tasks: updatedTasks };
             });
             setShowEditForm(false);
@@ -431,7 +435,7 @@ export default function TeamPage({ params }) {
                         <form className="bg-panel rounded-md border border-line flex flex-col w-full min-w-0 max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto" onSubmit={handleAddTask}>
                             <div className="px-5 py-4 border-b border-line flex items-center justify-between">
                                 <h2 className="text-lg font-semibold text-ink">Create New Task</h2>
-                                <button type="button" onClick={() => setShowAddForm(false)} aria-label="Close create task" className="text-muted hover:text-ink transition-colors"><RiCloseLine size={22} /></button>
+                                <button type="button" onClick={() => { setShowAddForm(false); setAddTaskError(""); }} aria-label="Close create task" className="text-muted hover:text-ink transition-colors"><RiCloseLine size={22} /></button>
                             </div>
                             <div className="p-5 flex flex-col gap-4">
                                 <div className="flex flex-col gap-1.5">
@@ -448,12 +452,15 @@ export default function TeamPage({ params }) {
                                     <input id="task-due-date" type="date" className="min-w-0 w-full px-3 py-2 bg-panel border border-line rounded-md text-sm text-ink focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors" value={dueDate} onChange={e => setDueDate(e.target.value)} />
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label htmlFor="task-description" className="text-sm font-medium text-muted">Description</label>
-                                    <textarea id="task-description" className="min-w-0 px-3 py-2 bg-panel border border-line rounded-md text-sm text-ink focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors min-h-[100px] resize-none" placeholder="Describe the task..." value={description} onChange={e => setDescription(e.target.value)} required />
+                                    <label htmlFor="task-description" className="text-sm font-medium text-muted">Description <span className="font-normal text-subtle">(optional)</span></label>
+                                    <textarea id="task-description" className="min-w-0 px-3 py-2 bg-panel border border-line rounded-md text-sm text-ink focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors min-h-[100px] resize-none" placeholder="Describe the task..." value={description} onChange={e => setDescription(e.target.value)} />
                                 </div>
                             </div>
+                            {addTaskError && (
+                                <p role="alert" className="mx-5 mb-2 rounded-md border border-danger-border bg-danger-bg px-3 py-2 text-xs text-danger">{addTaskError}</p>
+                            )}
                             <div className="px-5 py-4 border-t border-line flex flex-wrap gap-3 justify-end">
-                                <button type="button" className="px-4 py-2 rounded-md bg-panel border border-line text-muted font-medium hover:bg-raised transition-colors text-sm" onClick={() => setShowAddForm(false)}>Cancel</button>
+                                <button type="button" className="px-4 py-2 rounded-md bg-panel border border-line text-muted font-medium hover:bg-raised transition-colors text-sm" onClick={() => { setShowAddForm(false); setAddTaskError(""); }}>Cancel</button>
                                 <button type="submit" className="px-4 py-2 rounded-md bg-accent text-on-accent font-medium hover:bg-accent/90 transition-colors text-sm">Create Task</button>
                             </div>
                         </form>
@@ -483,8 +490,8 @@ export default function TeamPage({ params }) {
                                         <input id="edit-task-due-date" type="date" className="min-w-0 w-full px-3 py-2 bg-panel border border-line rounded-md text-sm text-ink focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} />
                                     </div>
                                     <div className="flex flex-col gap-1.5">
-                                        <label htmlFor="edit-task-description" className="text-sm font-medium text-muted">Description</label>
-                                        <textarea id="edit-task-description" className="min-w-0 px-3 py-2 bg-panel border border-line rounded-md text-sm text-ink focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors min-h-[100px] resize-none" value={editDescription} onChange={e => setEditDescription(e.target.value)} required />
+                                        <label htmlFor="edit-task-description" className="text-sm font-medium text-muted">Description <span className="font-normal text-subtle">(optional)</span></label>
+                                        <textarea id="edit-task-description" className="min-w-0 px-3 py-2 bg-panel border border-line rounded-md text-sm text-ink focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-colors min-h-[100px] resize-none" value={editDescription} onChange={e => setEditDescription(e.target.value)} />
                                     </div>
                                 </div>
                                 {taskSaveError && <p role="alert" className="mx-5 mb-4 rounded-md border border-danger-border bg-danger-bg px-3 py-2 text-xs text-danger">{taskSaveError}</p>}

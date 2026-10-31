@@ -38,6 +38,8 @@ export default function TeamsPage() {
     const [summaryModalOpen, setSummaryModalOpen] = useState(false);
     const [summaryContent, setSummaryContent] = useState("");
 
+    const [addTeamError, setAddTeamError] = useState("");
+
     const [search, setSearch] = useState("");
 
     const teamNameInputRef = useRef(null);
@@ -95,6 +97,7 @@ export default function TeamsPage() {
             ? [{ title: initialTaskTitle, status: initialTaskStage.value }]
             : [];
         if (!teamName.trim()) return;
+        setAddTeamError("");
 
         try {
             const res = await fetch("/api/teams", {
@@ -114,7 +117,7 @@ export default function TeamsPage() {
 
             fetchTeams(page, { silent: true });
         } catch (err) {
-            alert("Failed to add team");
+            setAddTeamError("Couldn't create team. Please try again.");
         }
     }
 
@@ -210,7 +213,7 @@ export default function TeamsPage() {
                             {showForm && (
                                 <AddTeamModal
                                     show={showForm}
-                                    onClose={() => setShowForm(false)}
+                                    onClose={() => { setShowForm(false); setAddTeamError(""); }}
                                     onSubmit={handleAddTeam}
                                     teamName={teamName}
                                     setTeamName={setTeamName}
@@ -220,6 +223,7 @@ export default function TeamsPage() {
                                     setInitialTaskStage={setInitialTaskStage}
                                     STAGES={STAGES}
                                     teamNameInputRef={teamNameInputRef}
+                                    error={addTeamError}
                                 />
                             )}
 
@@ -245,7 +249,7 @@ export default function TeamsPage() {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
                                                     {filteredTeams.map((team) => {
                                                         const totalTasks = team.tasks?.length || 0;
                                                         const completedTasks = team.tasks?.filter(t => t.status === "Completed").length || 0;
@@ -253,11 +257,11 @@ export default function TeamsPage() {
                                                         return (
                                                             <div
                                                                 key={team.id || team._id}
-                                                                className={styles.teamCard}
+                                                                className={`${styles.teamCard} p-3.5 md:p-[22px]`}
                                                             >
-                                                                <div className="flex justify-between items-start gap-3 mb-5">
-                                                                    <div className="min-w-0"><p className={styles.teamLabel}>{totalTasks} {totalTasks === 1 ? "task" : "tasks"}</p>
-                                                                        <h2 className="min-w-0 text-ink break-words">
+                                                                <div className="flex justify-between items-start gap-2 mb-2 md:gap-3 md:mb-5">
+                                                                    <div className="min-w-0 self-center"><p className={`${styles.teamLabel} hidden md:block mb-2.5`}>{totalTasks} {totalTasks === 1 ? "task" : "tasks"}</p>
+                                                                        <h2 className="min-w-0 self-center text-base md:text-[19px] text-ink break-words">
                                                                             <Link href={`/teams/${team.id || team._id}`} className="hover:text-ink transition-colors">{team.name}</Link>
                                                                         </h2></div>
                                                                     <div className="flex shrink-0 items-center gap-1">
@@ -267,7 +271,7 @@ export default function TeamsPage() {
                                                                                 handleAISummary(team);
                                                                             }}
                                                                             disabled={isSummarizing}
-                                                                            className="p-2 rounded-md text-subtle hover:bg-raised hover:text-ink transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
+                                                                            className="inline-flex h-10 w-10 md:h-8 md:w-8 items-center justify-center rounded-md text-subtle hover:bg-raised hover:text-ink transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
                                                                             title="AI Summary"
                                                                             aria-label={`Summarize ${team.name}`}
                                                                         >
@@ -280,7 +284,7 @@ export default function TeamsPage() {
                                                                         <button
                                                                             onClick={() => setTeamToDelete(team)}
                                                                             disabled={deletingTeamId === (team.id || team._id)}
-                                                                            className="p-2 rounded-md text-subtle hover:bg-danger-bg hover:text-danger transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
+                                                                            className="inline-flex h-10 w-10 md:h-8 md:w-8 items-center justify-center rounded-md text-subtle hover:bg-danger-bg hover:text-danger transition-colors cursor-pointer disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-blue-300"
                                                                             title="Delete Team"
                                                                             aria-label={`Delete ${team.name}`}
                                                                         >
@@ -289,13 +293,14 @@ export default function TeamsPage() {
                                                                     </div>
                                                                 </div>
 
-                                                                <div className="flex-1 mb-5">
+                                                                <div className="flex items-center gap-4 md:contents">
+                                                                <div className="min-w-0 flex-1 md:mb-5">
                                                                     <div className="flex flex-col gap-2.5">
                                                                         <div className={`flex justify-between gap-2 text-muted ${styles.progressLabel}`}>
-                                                                            <span>{completedTasks} of {totalTasks} tasks complete</span>
+                                                                            <span>{completedTasks} of {totalTasks} complete</span>
                                                                             <span>{totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}%</span>
                                                                         </div>
-                                                                        <div className="w-full h-1 bg-raised overflow-hidden">
+                                                                        <div role="progressbar" aria-label={`${team.name} task completion`} aria-valuenow={totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0} aria-valuemin={0} aria-valuemax={100} className="w-full h-1 bg-raised overflow-hidden">
                                                                             <div
                                                                                 className="h-full bg-accent"
                                                                                 style={{ width: `${totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0}%` }}
@@ -306,13 +311,14 @@ export default function TeamsPage() {
 
                                                                 <Link
                                                                     href={`/teams/${team.id || team._id}`}
-                                                                    className="flex items-center justify-between border-t border-line pt-4 text-muted hover:text-ink transition-colors mt-auto"
+                                                                    className="flex min-h-10 shrink-0 items-center justify-between gap-2 text-muted hover:text-ink transition-colors md:min-h-0 md:border-t md:border-line md:pt-4 md:mt-auto"
                                                                 >
                                                                     <div className="flex items-center gap-3">
-                                                                        <span className="text-sm font-medium">Open board</span>
+                                                                        <span className="text-xs md:text-sm font-medium">Open board</span>
                                                                     </div>
                                                                     <MdArrowForward aria-hidden="true" />
                                                                 </Link>
+                                                                </div>
                                                             </div>
                                                         );
                                                     })}
